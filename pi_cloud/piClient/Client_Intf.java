@@ -1,4 +1,4 @@
-package pi_cloud;
+package pi_cloud.piClient;
 
 import java.rmi.*;
 

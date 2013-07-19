@@ -1,15 +1,35 @@
-package pi_cloud;
+package pi_cloud.piManager;
 
-import piClient.*;
+import pi_cloud.piClient.*;
+import java.rmi.*;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 public class Cluster {
     
     //private ArrayList<Pi> piCluster;
     private HashMap<Client_Intf, Pi> piCluster;
+    private StatusManager statMan;
 
-    protected Cluster() {
+    protected Cluster(String host, short port) {
         piCluster = new HashMap<Client_Intf, Pi>();
+        System.out.println("Cluster initialised.");
+        
+        // creating status manager
+        try {
+            statMan = new StatusManager(this);
+            UnicastRemoteObject.unexportObject(statMan, true);
+            StatusManager_Intf registryStub = (StatusManager_Intf) UnicastRemoteObject.exportObject(statMan, 0);
+            System.out.println("StatusManager remote object successfully created.");
+
+            Naming.rebind("//" + host + ":" + port + "/StatusManager", registryStub);
+            System.out.println("StatusManager successfully bound to server.");
+            System.out.println("Cluster & StatusManager successfully intialised.");
+        } catch (Exception e) {
+            System.out.println("Cluster.java: Error creating status manager");
+            e.printStackTrace();
+        } 
+        
     }
 
     protected boolean addClient(Client_Intf n) {
@@ -69,13 +89,7 @@ public class Cluster {
 
 
     /* ------- test methods -------- */
-    public boolean testAlgAndStat() {
-        
-
-        return true;
-    }
-
-    public boolean testTaskAndRes() {
+    public boolean test() {
         return true;
     }
 

@@ -1,6 +1,6 @@
-package pi_cloud;
+package pi_cloud.piManager;
 
-import piClient.*;
+import pi_cloud.piClient.*;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -33,6 +33,12 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
     // Define parents and children within the network, used pre-execution of certain algorithms.
     private void defineClusterNetworking() {
 
+    }
+    
+    /* ------- test methods -------- */
+    protected boolean testRegistration() {
+        // connect to 'remote' object of client
+        return true;
     }
 
 }

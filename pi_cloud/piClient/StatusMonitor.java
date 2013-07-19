@@ -1,6 +1,6 @@
-package pi_cloud;
+package pi_cloud.piClient;
 
-import piManager.*;
+import pi_cloud.piManager.*;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 

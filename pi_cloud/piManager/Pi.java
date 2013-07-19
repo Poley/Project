@@ -1,6 +1,7 @@
-package pi_cloud;
+package pi_cloud.piManager;
 
-import piClient.*;
+import pi_cloud.piClient.*;
+
 public class Pi {
 
     //private Client_Intf node;

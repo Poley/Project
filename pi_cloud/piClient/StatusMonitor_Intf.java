@@ -1,6 +1,7 @@
-package pi_cloud;
+package pi_cloud.piClient;
 
 import java.rmi.*;
+import pi_cloud.piManager.*;
 
 public interface StatusMonitor_Intf extends Remote {
 

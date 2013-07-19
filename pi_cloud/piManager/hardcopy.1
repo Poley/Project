@@ -1,0 +1,74 @@
+ 2 Client.java  2 StatusMonitor_Intf.java                                                                       X
+  1 package pi_cloud;
+  2
+  3 import piManager.*;
+  4 import java.rmi.*;
+  5 import java.rmi.server.UnicastRemoteObject;
+  6
+  7 public class Client extends UnicastRemoteObject implements Client_Intf, Serializable {
+  8
+  9     private Dispatcher_Intf dispatch;
+ 10     private boolean busy;
+ 11     private StatusMonitor_Intf sm;
+ 12
+ 13     private String host;
+ 14     private short port;
+ 15
+ 16     public Client() throws RemoteException {
+ 17         sm = new StatusMonitor();
+ 18
+ 19
+ 20     }
+ 21
+ 22     public boolean executeAlgorithm() throws RemoteException {
+ 23         return true;
+ 24     }
+ 25
+ 26     public StatusMonitor_Intf getStatusMonitor() throws RemoteException {
+ 27         return sm;
+ 28     }
+ 29
+ 30     public boolean test() {
+ 31         return true;
+ 32     }
+ 33 }
+~
+~
+~
+~
+Client.java                                                                                    17,9           All
+  1 package pi_cloud;
+  2
+  3 import java.rmi.*;
+  4
+  5 public interface Client_Intf extends Remote {
+  6
+  7     public boolean executeAlgorithm() throws RemoteException;
+  8     public StatusMonitor_Intf getStatusMonitor() throws RemoteException;
+  9
+ 10 }
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+Client_Intf.java                                                                               1,1            All
+:wa
