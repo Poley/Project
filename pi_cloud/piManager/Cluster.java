@@ -13,20 +13,20 @@ public class Cluster {
 
     protected Cluster(String host, short port) {
         piCluster = new HashMap<Client_Intf, Pi>();
-        System.out.println("Cluster initialised.");
+        System.out.println("Success: Cluster initialised.");
         
         // creating status manager
         try {
             statMan = new StatusManager(this);
             UnicastRemoteObject.unexportObject(statMan, true);
             StatusManager_Intf registryStub = (StatusManager_Intf) UnicastRemoteObject.exportObject(statMan, 0);
-            System.out.println("StatusManager remote object successfully created.");
+            System.out.println("Success: StatusManager exported to registry.");
 
             Naming.rebind("//" + host + ":" + port + "/StatusManager", registryStub);
-            System.out.println("StatusManager successfully bound to server.");
-            System.out.println("Cluster & StatusManager successfully intialised.");
+            System.out.println("Success: StatusManager bound to reference.");
+            System.out.println("Success: Cluster & StatusManager intialised.");
         } catch (Exception e) {
-            System.out.println("Cluster.java: Error creating status manager");
+            System.out.println("FAILURE: Cluster.java: Error creating status manager");
             e.printStackTrace();
         } 
         
@@ -65,7 +65,9 @@ public class Cluster {
         piCluster.put(n, node);
         return true;
     }
-    
+   
+    /* Getters & Setters */
+
     protected HashMap<Client_Intf, Pi> getFullDetails() {
         return piCluster;
     }

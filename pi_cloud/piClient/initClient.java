@@ -3,10 +3,12 @@ package pi_cloud.piClient;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.net.MalformedURLException;
+
 public class initClient {
 
     private static String host = "localhost";
-    private static short port = 1098;
+    private static short clientPort = 1099;
 
     public initClient() {}
 
@@ -14,32 +16,35 @@ public class initClient {
         Client client = null;
         Client_Intf registryStub = null;
 
-        try { LocateRegistry.createRegistry(1098); }
+        try { LocateRegistry.createRegistry(1099); }
         catch (Exception e) { e.printStackTrace(); }
-
-        try {
-            client = new Client(host, port);
-            UnicastRemoteObject.unexportObject(client, true);
-            registryStub = (Client_Intf) UnicastRemoteObject.exportObject(client, port);
-            System.out.println("Client's remote object created successfully.");
-        } catch (Exception e) { 
-            System.out.println("initClient.java: Error creating exporting remote object.");
-            e.printStackTrace(); 
-        }
 
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new RMISecurityManager() );
-            System.out.println("Security Manager successfully created.");
+            System.out.println("Success: Security Manager created.");
         } 
 
         try {
-            Naming.rebind("//" + host + ":" + port + "/Client", registryStub);
-            System.out.println("Client successfully bound to server registry.");
-            System.out.println("Client has been successfully initialised.");
-        } catch (Exception e) {
-            System.out.println("initClient.java: Error in binding Client object to registry.");
+            client = new Client(host, clientPort);
+            
+            try {UnicastRemoteObject.unexportObject(client, true); }
+            catch (Exception e) {};
+            registryStub = (Client_Intf) UnicastRemoteObject.exportObject(client, clientPort);
+            System.out.println("Success: Client exported to registry.");
+            
+            try { Naming.unbind("//" + host + ":" + clientPort + "/Client");
+            } catch (NotBoundException e) {}
+            Naming.rebind("//" + host + ":" + clientPort + "/Client", registryStub);
+            
+            System.out.println("Success: Client bound to reference.");
+            System.out.println("Success: Client initialised.");
+        } catch (RemoteException e) {
+            System.out.println("FAILURE: Client.java: Error exporting Client to registry.");
             e.printStackTrace();
-        }
+        } catch (MalformedURLException e) {
+            System.out.println("FAILURE: Client.java: URL binding the Client object is malformed.");
+            e.printStackTrace();
+        } 
 
     } 
 

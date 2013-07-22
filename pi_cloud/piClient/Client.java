@@ -3,6 +3,7 @@ package pi_cloud.piClient;
 import pi_cloud.piManager.*;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
+import java.net.MalformedURLException;
 import java.io.Serializable;
 
 public class Client extends UnicastRemoteObject implements Client_Intf, Serializable {
@@ -12,22 +13,29 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
     private StatusMonitor_Intf sm;
 
     private String host;
-    private short port = 1079;
+    private short statMonPort= 1098;
     
     public Client(String h, short p) throws RemoteException {
         host = h;
         //port = p;
         
         sm = new StatusMonitor();
-        try { 
-            UnicastRemoteObject.unexportObject(sm, true);
-            StatusMonitor_Intf regStub = (StatusMonitor_Intf) UnicastRemoteObject.exportObject(sm, port);
-            System.out.println("Status Monitor remote object has been successfully created.");
 
-            Naming.rebind("//" + host + "/ClientStatusMonitor", regStub);
-            System.out.println("Status Monitor has been successfully bound to registry.");
-        } catch (Exception e) {
-            System.out.println("Client.java Error in binding Status Monitor");
+        try {
+            UnicastRemoteObject.unexportObject(sm, true);
+            StatusMonitor_Intf regStub = (StatusMonitor_Intf) UnicastRemoteObject.exportObject(sm, statMonPort);
+            System.out.println("Success: Status Monitor exported to registry.");
+           
+            try { Naming.unbind("//" + host + ":" + statMonPort + "/ClientStatusMonitor");
+            } catch (Exception e) {}
+
+            Naming.rebind("//" + host + ":" + statMonPort + "/ClientStatusMonitor", regStub);
+            System.out.println("Success: Status Monitor bound to reference.");
+        } catch (RemoteException e) {
+            System.out.println("FAILURE: Client.java: Error exporting Status Monitor to registry.");
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            System.out.println("FAILURE: Client.java: URL binding the Status Monitor object is malformed.");
             e.printStackTrace();
         } 
     }
