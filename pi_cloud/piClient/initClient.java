@@ -4,19 +4,39 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.net.MalformedURLException;
+import java.net.*;
+import java.util.Enumeration;
 
 public class initClient {
 
-    private static String host = "localhost";
-    private static short clientPort = 1099;
+    private static String host;
+    private static short port = 1097;
 
     public initClient() {}
 
     public static void main(String args[]) {
         Client client = null;
         Client_Intf registryStub = null;
+        
+        // Finding address of local eth0 address
+        try {
+            NetworkInterface ni = NetworkInterface.getByName("eth0");
+            Enumeration<InetAddress> inetAddresses = ni.getInetAddresses();
 
-        try { LocateRegistry.createRegistry(1099); }
+            while (inetAddresses.hasMoreElements() ) {
+                InetAddress ia = inetAddresses.nextElement();
+                if(!ia.isLinkLocalAddress() ) {
+                    host = ia.getHostAddress();
+                    System.out.println("Local IP Address: " + host); 
+                } 
+            } 
+        } catch (Exception e) { } 
+
+
+        //host = "localhost";
+
+        // Setting up RMI Objects
+        try { LocateRegistry.createRegistry( port); }
         catch (Exception e) { e.printStackTrace(); }
 
         if (System.getSecurityManager() == null) {
@@ -25,18 +45,20 @@ public class initClient {
         } 
 
         try {
-            client = new Client(host, clientPort);
+            client = new Client(host, port);
             
             try {UnicastRemoteObject.unexportObject(client, true); }
             catch (Exception e) {};
-            registryStub = (Client_Intf) UnicastRemoteObject.exportObject(client, clientPort);
+            registryStub = (Client_Intf) UnicastRemoteObject.exportObject(client, port);
             System.out.println("Success: Client exported to registry.");
-            
-            try { Naming.unbind("//" + host + ":" + clientPort + "/Client");
+           
+            String rmiRef = "//" + host + ":" + port + "/Client";
+
+            try { Naming.unbind( rmiRef);
             } catch (NotBoundException e) {}
-            Naming.rebind("//" + host + ":" + clientPort + "/Client", registryStub);
+            Naming.rebind( rmiRef, registryStub);
             
-            System.out.println("Success: Client bound to reference.");
+            System.out.println("Success: Client bound to reference at: \"" + rmiRef + "\"");
             System.out.println("Success: Client initialised.");
         } catch (RemoteException e) {
             System.out.println("FAILURE: Client.java: Error exporting Client to registry.");
@@ -44,7 +66,9 @@ public class initClient {
         } catch (MalformedURLException e) {
             System.out.println("FAILURE: Client.java: URL binding the Client object is malformed.");
             e.printStackTrace();
-        } 
+        }
+
+        client.interact();
 
     } 
 

@@ -6,5 +6,6 @@ public interface Client_Intf extends Remote {
 
     public boolean executeAlgorithm() throws RemoteException;
     public StatusMonitor_Intf getStatusMonitor() throws RemoteException;
+    public String getHost() throws RemoteException;
 
 }

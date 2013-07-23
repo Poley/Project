@@ -3,7 +3,9 @@ package pi_cloud.piManager;
 import pi_cloud.piClient.*;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
-import java.net.MalformedURLException;
+import java.rmi.registry.*;
+import java.net.*;
+import java.util.Enumeration;
 
 import java.util.HashMap;
 import java.io.BufferedReader;
@@ -14,13 +16,32 @@ public class Controller {
     private Cluster cluster;
     private Dispatcher dispatch;
 
-    private String host = "localhost";
-    private short port = 1099;
-    /* Needs to export and bind remote objects (dispatcher).
-        */
+    private String host; 
+    private short port = 1098;
+    private short clientPort = 1097;
 
     public Controller() {
-        //dispatch = null; 
+        // Finding local IP address
+        try {
+            NetworkInterface ni = NetworkInterface.getByName("eth0");
+            Enumeration<InetAddress> inetAddresses = ni.getInetAddresses();
+
+            while (inetAddresses.hasMoreElements() ) {
+                InetAddress ia = inetAddresses.nextElement();
+                if(!ia.isLinkLocalAddress() ) {
+                    host = ia.getHostAddress();
+                    System.out.println("Local IP Address: " + host); 
+                } 
+            } 
+        } catch (Exception e) { } 
+
+
+        //host = "localhost";
+
+        // Setting up RMI Objects
+        try { LocateRegistry.createRegistry( port); }
+        catch (Exception e) { e.printStackTrace(); }
+
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new RMISecurityManager() );
             System.out.println("Success: Security Manager created.");
@@ -29,9 +50,9 @@ public class Controller {
         cluster = new Cluster(host, port); // cluster exports and binds status manager
 
         try {
-            dispatch = new Dispatcher(this);
+            dispatch = new Dispatcher(this, clientPort);
             UnicastRemoteObject.unexportObject(dispatch, true);
-            Dispatcher_Intf registryStub = (Dispatcher_Intf) UnicastRemoteObject.exportObject(dispatch, 0);
+            Dispatcher_Intf registryStub = (Dispatcher_Intf) UnicastRemoteObject.exportObject(dispatch, port);
             System.out.println("Success: Dispatcher exported to registry.");
             
             Naming.rebind("//" + host + ":" + port + "/Dispatcher", registryStub);
@@ -77,7 +98,8 @@ public class Controller {
                             System.out.println("\nError reading input.");
                             continue;
                         } 
-                        System.out.println("Note: default port for accessing client is 1099.\n\nAttempting to register client at ip " + strInput + "...");
+                        //System.out.println("Note: default port for accessing client is 1099.\n\nAttempting to register client at ip '" + strInput + "'...");
+                        System.out.println();
                         dispatch.addIPAndRegister(strInput);
                         continue;
                 case 0: System.out.println("Exiting...");
@@ -93,8 +115,7 @@ public class Controller {
     }
 
     public boolean addClient(Client_Intf c) {
-        return true;
-        //return cluster.addClient(c);
+        return cluster.addClient(c);
     }
     
     public boolean removeClient(Client_Intf c) {

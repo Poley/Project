@@ -3,8 +3,9 @@ package pi_cloud.piClient;
 import pi_cloud.piManager.*;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
+import java.io.Serializable;
 
-public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_Intf {
+public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_Intf, Serializable {
 
     private StatusManager_Intf statMan;
     private String task;
@@ -19,6 +20,7 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     private short resourceRefreshRate;
 
     public StatusMonitor() throws RemoteException {
+        task = "empty";
         taskRefreshRate = 0;
         resourceRefreshRate = 0;
     }

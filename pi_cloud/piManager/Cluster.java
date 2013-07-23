@@ -34,6 +34,8 @@ public class Cluster {
 
     protected boolean addClient(Client_Intf n) {
         try { 
+            System.out.println( "Adding client @ " + n.getHost() + " to cluster...");
+            System.out.println( n.getStatusMonitor().getTask() );
             piCluster.put(n, new Pi( n.getStatusMonitor()) );
             return true;
         } catch (Exception e) { 
