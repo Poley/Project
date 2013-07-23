@@ -5,8 +5,8 @@ import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
 import java.net.*;
-import java.util.Enumeration;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -17,8 +17,8 @@ public class Controller {
     private Dispatcher dispatch;
 
     private String host; 
-    private short port = 1098;
-    private short clientPort = 1097;
+    private short port = 1099;
+    //private short clientPort = 1097;
 
     public Controller() {
         // Finding local IP address
@@ -35,36 +35,38 @@ public class Controller {
             } 
         } catch (Exception e) { } 
 
-
-        //host = "localhost";
-
-        // Setting up RMI Objects
-        try { LocateRegistry.createRegistry( port); }
+        /*Registry reg = LocateRegistry.getRegistry();
+        // Setting up RMI Objects and registry
+        try { 
+            reg = LocateRegistry.createRegistry( port); }
         catch (Exception e) { e.printStackTrace(); }
-
+        */
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new RMISecurityManager() );
             System.out.println("Success: Security Manager created.");
         } 
         
-        cluster = new Cluster(host, port); // cluster exports and binds status manager
 
         try {
-            dispatch = new Dispatcher(this, clientPort);
+            Registry reg = LocateRegistry.createRegistry( port);
+            cluster = new Cluster(host, port, reg); // cluster exports and binds status manager
+            
+            dispatch = new Dispatcher(this);
             UnicastRemoteObject.unexportObject(dispatch, true);
             Dispatcher_Intf registryStub = (Dispatcher_Intf) UnicastRemoteObject.exportObject(dispatch, port);
             System.out.println("Success: Dispatcher exported to registry.");
             
-            Naming.rebind("//" + host + ":" + port + "/Dispatcher", registryStub);
+            //Naming.rebind("//" + host + ":" + port + "/Dispatcher", registryStub);
+            reg.rebind("Dispatcher", registryStub);
             System.out.println("Success: Dispatcher bound to reference.");
             System.out.println("Success: PiManager created.");
         } catch (RemoteException e) {
             System.out.println("FAILURE: Controller.java: Error exporting dispatcher to registry.");
             e.printStackTrace();
-        } catch (MalformedURLException e) {
-            System.out.println("FAILURE: Controller.java: URL binding the dispathcer is malformed.");
-            e.printStackTrace();
-        } 
+        }// catch (MalformedURLException e) {
+         //   System.out.println("FAILURE: Controller.java: URL binding the dispathcer is malformed.");
+         //   e.printStackTrace();
+        //} 
     }
 
     public static void main(String args[]) {
@@ -79,7 +81,6 @@ public class Controller {
         while (true) {
             System.out.println("\n_________\nAvailable actions:");
             System.out.println("1: Activate test methods.");
-            System.out.println("2: Add IP and add to cluster.");
             System.out.println("0: Exit.");
             
             input = -1;
@@ -91,17 +92,6 @@ public class Controller {
                 case 1: System.out.println("Executing test methods.");
                         testComs(); 
                         break;
-                case 2: System.out.print("Please enter the IP of the client you wish to register to the cluster (192.168.100.xxx): 192.168.100.");
-                        try {
-                            strInput = "192.168.100." + inputStream.readLine();
-                        } catch (Exception e) {
-                            System.out.println("\nError reading input.");
-                            continue;
-                        } 
-                        //System.out.println("Note: default port for accessing client is 1099.\n\nAttempting to register client at ip '" + strInput + "'...");
-                        System.out.println();
-                        dispatch.addIPAndRegister(strInput);
-                        continue;
                 case 0: System.out.println("Exiting...");
                         System.exit(1);
                 default:System.out.println("Error: Unrecognised Input.");
@@ -131,9 +121,10 @@ public class Controller {
 
     }
 
-    public void addIPAndRegister(String ip) {
-        dispatch.addIPAndRegister(ip);
-    } 
+    public String getHost() {
+        return host;
+    }
+
 
     /* ------- test methods -------- */
     public void testComs() {

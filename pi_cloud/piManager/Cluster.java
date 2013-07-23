@@ -1,6 +1,7 @@
 package pi_cloud.piManager;
 
 import pi_cloud.piClient.*;
+import java.rmi.registry.*;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
@@ -11,7 +12,7 @@ public class Cluster {
     private HashMap<Client_Intf, Pi> piCluster;
     private StatusManager statMan;
 
-    protected Cluster(String host, short port) {
+    protected Cluster(String host, short port, Registry reg) {
         piCluster = new HashMap<Client_Intf, Pi>();
         System.out.println("Success: Cluster initialised.");
         
@@ -21,8 +22,8 @@ public class Cluster {
             UnicastRemoteObject.unexportObject(statMan, true);
             StatusManager_Intf registryStub = (StatusManager_Intf) UnicastRemoteObject.exportObject(statMan, 0);
             System.out.println("Success: StatusManager exported to registry.");
-
-            Naming.rebind("//" + host + ":" + port + "/StatusManager", registryStub);
+            
+            reg.rebind("//" + host + ":" + port + "/StatusManager", registryStub);
             System.out.println("Success: StatusManager bound to reference.");
             System.out.println("Success: Cluster & StatusManager intialised.");
         } catch (Exception e) {
@@ -34,14 +35,14 @@ public class Cluster {
 
     protected boolean addClient(Client_Intf n) {
         try { 
-            System.out.println( "Adding client @ " + n.getHost() + " to cluster...");
-            System.out.println( n.getStatusMonitor().getTask() );
             piCluster.put(n, new Pi( n.getStatusMonitor()) );
-            return true;
+            System.out.println( "Cluster.java: Client at " + n.getHost() + " added to cluster...\n____");
         } catch (Exception e) { 
+            System.out.println( "FAILURE: Cluster.java: Error adding client to cluster.");
             e.printStackTrace(); 
             return false; 
         }
+        return true;
     } 
     
     protected boolean removeClient(Client_Intf n) {

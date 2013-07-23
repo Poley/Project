@@ -10,7 +10,8 @@ import java.util.Enumeration;
 public class initClient {
 
     private static String host;
-    private static short port = 1097;
+    private static String serverAddress = "192.168.100.100";
+    private static short serverPort = 1099;
 
     public initClient() {}
 
@@ -31,10 +32,20 @@ public class initClient {
                 } 
             } 
         } catch (Exception e) { } 
+        
+        try {
+            client = new Client(host, serverAddress, serverPort);
+            client.interact();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    } 
 
 
-        //host = "localhost";
-
+        //client.interact();
+        
+        /*
         // Setting up RMI Objects
         try { LocateRegistry.createRegistry( port); }
         catch (Exception e) { e.printStackTrace(); }
@@ -52,7 +63,7 @@ public class initClient {
             registryStub = (Client_Intf) UnicastRemoteObject.exportObject(client, port);
             System.out.println("Success: Client exported to registry.");
            
-            String rmiRef = "//" + host + ":" + port + "/Client";
+            String rmiRef = "rmi://" + host + ":" + port + "/Client";
 
             try { Naming.unbind( rmiRef);
             } catch (NotBoundException e) {}
@@ -67,9 +78,7 @@ public class initClient {
             System.out.println("FAILURE: Client.java: URL binding the Client object is malformed.");
             e.printStackTrace();
         }
-
-        client.interact();
-
-    } 
+        */
+        
 
 } 

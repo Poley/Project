@@ -9,15 +9,19 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
 
     Controller c;
     ArrayList<String> ipAddresses = new ArrayList<String>();
-    short port ; 
 
-    public Dispatcher(Controller contr, short p) throws RemoteException {
+    public Dispatcher(Controller contr) throws RemoteException {
         super(); 
         c = contr;
-        port = p;
     }
 
     public boolean register(Client_Intf node) throws RemoteException {
+        try {
+            System.out.println("___\nDispatcher.java: Registration request recieved from " + node.getHost() + ".");
+        } catch (Exception e) {
+            System.out.println("Dispatcher.java: Error calling node.getHost() server-side.");
+            e.printStackTrace();
+        }
         return c.addClient(node); 
     }
 
@@ -38,27 +42,11 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
     private void defineClusterNetworking() {
 
     }
-    
-    protected void addIPAndRegister(String ip) {
-        boolean success = false;
-        String rmiLookup = "rmi://" + ip + ":" + port + "/Client";
-        try {
-            System.out.println("Looking for client at: \"" + rmiLookup + "\"");
-            Client_Intf cli = (Client_Intf) Naming.lookup( rmiLookup);
-            //Client_Intf cli = (Client_Intf) Naming.lookup("rmi://" + "localhost" + ":" + port + "/Client"); 
-            System.out.println("Dispatcher.java: Found client object @ " + cli.getHost() );
-            if (register(cli)) {
-                ipAddresses.add(ip);
-                System.out.println("Dispatcher.java: Found Client object @ " + cli.getHost() );
-            }
-        } catch (Exception e) {
-            System.out.println("FAILURE: Dispatcher.java: Error looking up client. IP removed from list.");
-            e.printStackTrace();
-        }
-    } 
-
+   
     /* Getters & Setters */
-
+    public String getHost() throws RemoteException {
+        return c.getHost();
+    } 
 
     /* ------- test methods -------- */
     protected boolean testRegistration() {
