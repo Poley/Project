@@ -35,17 +35,10 @@ public class Controller {
             } 
         } catch (Exception e) { } 
 
-        /*Registry reg = LocateRegistry.getRegistry();
-        // Setting up RMI Objects and registry
-        try { 
-            reg = LocateRegistry.createRegistry( port); }
-        catch (Exception e) { e.printStackTrace(); }
-        */
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new RMISecurityManager() );
             System.out.println("Success: Security Manager created.");
         } 
-        
 
         try {
             Registry reg = LocateRegistry.createRegistry( port);
@@ -63,10 +56,7 @@ public class Controller {
         } catch (RemoteException e) {
             System.out.println("FAILURE: Controller.java: Error exporting dispatcher to registry.");
             e.printStackTrace();
-        }// catch (MalformedURLException e) {
-         //   System.out.println("FAILURE: Controller.java: URL binding the dispathcer is malformed.");
-         //   e.printStackTrace();
-        //} 
+        }
     }
 
     public static void main(String args[]) {
@@ -80,7 +70,8 @@ public class Controller {
         String strInput;
         while (true) {
             System.out.println("\n_________\nAvailable actions:");
-            System.out.println("1: Activate test methods.");
+            System.out.println("2: Request status update from clients."); 
+            System.out.println("1: Get tasks from each client.");
             System.out.println("0: Exit.");
             
             input = -1;
@@ -89,8 +80,12 @@ public class Controller {
             System.out.println("_________"); 
 
             switch(input) {
-                case 1: System.out.println("Executing test methods.");
-                        testComs(); 
+                case 2: cluster.requestTaskDetailUpdate();
+                        System.out.println("Update request sent.");
+                        break;
+                case 1: System.out.println("Requesting current task from each client...\n");
+                        if (cluster.size() > 0) cluster.printClusterTasks();
+                        else System.out.println("Cluster is empty.");
                         break;
                 case 0: System.out.println("Exiting...");
                         System.exit(1);
@@ -104,8 +99,8 @@ public class Controller {
         dispatch.executeAlgorithm();
     }
 
-    public boolean addClient(Client_Intf c) {
-        return cluster.addClient(c);
+    public boolean addClient(Client_Intf c, String hostname) {
+        return cluster.addClient(c, hostname);
     }
     
     public boolean removeClient(Client_Intf c) {
@@ -125,13 +120,4 @@ public class Controller {
         return host;
     }
 
-
-    /* ------- test methods -------- */
-    public void testComs() {
-        boolean algStat = dispatch.testRegistration(); 
-        boolean taskRes = cluster.test(); 
-            
-        if (algStat && taskRes) System.out.println( "All basic test methods complete.");
-        else System.out.println("Tests were NOT unanimously successful.");
-    }
 }

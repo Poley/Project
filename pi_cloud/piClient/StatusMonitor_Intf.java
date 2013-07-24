@@ -11,6 +11,9 @@ public interface StatusMonitor_Intf extends Remote {
     public String getTaskStatus() throws RemoteException;
     public boolean setTaskSchedule(short refreshRate, StatusManager_Intf sm) throws RemoteException;
     public boolean setResourceSchedule(short refreshRate, StatusManager_Intf sm) throws RemoteException;
+    public String getHost() throws RemoteException;
+    public void updateServer() throws RemoteException;
+    public void setStatusManager(StatusManager_Intf sm) throws RemoteException;
 
 }
 

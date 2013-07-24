@@ -6,14 +6,16 @@ public class Pi {
 
     //private Client_Intf node;
     private StatusMonitor_Intf statMon;
-    private String task;
-    private String taskStatus;
-    private int ttc;
-    private short cpuUsage;
-    private int memUsage;
+    private String host;
+    private String task = "Inactive";
+    private String taskStatus = "Inactive";
+    private int ttc = -1;
+    private short cpuUsage = -1;
+    private int memUsage = -1;
 
-    protected Pi(StatusMonitor_Intf statM) {
+    protected Pi(StatusMonitor_Intf statM, String hostname) {
         statMon = statM;
+        host = hostname;
     }
 
     protected boolean updateResourceDetails(short cpu, int mem) {
@@ -37,6 +39,14 @@ public class Pi {
     protected StatusMonitor_Intf getStatusMonitor() {
         return statMon;
     }
+
+    protected String getHost() {
+        return host;
+    }
+
+    protected String getTask() {
+        return task;
+    } 
 
 
 }

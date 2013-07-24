@@ -17,31 +17,30 @@ public class Cluster {
         System.out.println("Success: Cluster initialised.");
         
         // creating status manager
-        try {
+        try { 
             statMan = new StatusManager(this);
-            UnicastRemoteObject.unexportObject(statMan, true);
-            StatusManager_Intf registryStub = (StatusManager_Intf) UnicastRemoteObject.exportObject(statMan, 0);
-            System.out.println("Success: StatusManager exported to registry.");
-            
-            reg.rebind("//" + host + ":" + port + "/StatusManager", registryStub);
-            System.out.println("Success: StatusManager bound to reference.");
-            System.out.println("Success: Cluster & StatusManager intialised.");
-        } catch (Exception e) {
-            System.out.println("FAILURE: Cluster.java: Error creating status manager");
+        } catch (RemoteException e) { 
+            System.out.println("FAILURE: Cluster.java: Error creating Status Manager."); 
             e.printStackTrace();
-        } 
+        }
         
     }
 
-    protected boolean addClient(Client_Intf n) {
+    // NOTE: Whenever a new client is added, all clients in cluster have their details updated. This is likely unnecessary.
+    protected boolean addClient(Client_Intf n, String hn) {
         try { 
-            piCluster.put(n, new Pi( n.getStatusMonitor()) );
+            Pi newP = new Pi (n.getStatusMonitor(), hn);
+            statMan.setClientsStatusManager( newP.getStatusMonitor());
+            piCluster.put(n, newP);
+
             System.out.println( "Cluster.java: Client at " + n.getHost() + " added to cluster...\n____");
         } catch (Exception e) { 
             System.out.println( "FAILURE: Cluster.java: Error adding client to cluster.");
             e.printStackTrace(); 
             return false; 
         }
+        
+        //requestTaskDetailUpdate();
         return true;
     } 
     
@@ -62,12 +61,29 @@ public class Cluster {
         return true;
     }
 
+    // Called when a client wishes to update the server's stored task details on itself.
     protected boolean updateTaskDetails(Client_Intf n, String task, String taskStatus, int ttc) {
         Pi node = piCluster.get(n);
         node.updateTaskDetails(task, taskStatus, ttc);
         piCluster.put(n, node);
         return true;
     }
+    
+    // Triggers Status Manager to request all clients to update their task details and reply with the update.
+    protected void requestTaskDetailUpdate() {
+        statMan.requestTaskDetailUpdate( getStatusMonitors());
+    }
+    
+    protected void printClusterTasks() {
+        System.out.println("Host Name \t\tTask");
+
+        Pi pis[] = piCluster.values().toArray( new Pi[piCluster.size()] ); 
+        for (int i = 0; i < pis.length; i++) {
+            System.out.println(pis[i].getHost() + "\t\t" + pis[i].getTask() );
+        } 
+
+        System.out.println("All tasks retrieved.");
+    } 
    
     /* Getters & Setters */
 
@@ -75,27 +91,27 @@ public class Cluster {
         return piCluster;
     }
 
+    protected String[] getClientHosts() {
+        String[] hosts = new String[ piCluster.size()];
+        Client_Intf clients[] = (Client_Intf[]) piCluster.keySet().toArray();
+        for (int i = 0; i < hosts.length; i++) {
+            hosts[i] = piCluster.get( clients[i]).getHost();
+        }
+        return hosts;
+    } 
+
     protected StatusMonitor_Intf[] getStatusMonitors() {
         StatusMonitor_Intf statMons[] = new StatusMonitor_Intf[ piCluster.size()];
-        Client_Intf clients[] = (Client_Intf[]) piCluster.keySet().toArray();
-   
-        // create array of available stat monitors
+        Client_Intf clients[] = piCluster.keySet().toArray( new Client_Intf[piCluster.size()] );
         for (int i = 0; i < statMons.length; i++) {
             statMons[i] = piCluster.get(clients[i]).getStatusMonitor();
-
         }
         return statMons;
     }
 
-    protected int getClusterSize() {
+    protected int size() {
         return piCluster.size();
     }
 
-
-
-    /* ------- test methods -------- */
-    public boolean test() {
-        return true;
-    }
-
+   
 }

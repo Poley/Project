@@ -15,14 +15,14 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
         c = contr;
     }
 
-    public boolean register(Client_Intf node) throws RemoteException {
+    public boolean register(Client_Intf node, String hostname) throws RemoteException {
         try {
             System.out.println("___\nDispatcher.java: Registration request recieved from " + node.getHost() + ".");
         } catch (Exception e) {
             System.out.println("Dispatcher.java: Error calling node.getHost() server-side.");
             e.printStackTrace();
         }
-        return c.addClient(node); 
+        return c.addClient(node, hostname); 
     }
 
     public boolean unRegister(Client_Intf node) throws RemoteException {

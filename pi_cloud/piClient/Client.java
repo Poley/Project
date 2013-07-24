@@ -13,7 +13,8 @@ import java.io.InputStreamReader;
 public class Client extends UnicastRemoteObject implements Client_Intf, Serializable {
 
     private Dispatcher_Intf dispatch;
-    private StatusMonitor_Intf sm;
+    //private StatusMonitor_Intf sm;
+    private StatusMonitor sm;
     private boolean busy;
 
     private String localHost;
@@ -25,23 +26,33 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         serverAddress = sa;
         serverPort = p;
         
-        sm = new StatusMonitor();
+        sm = new StatusMonitor(localHost, this);
         
         // Acquire server's dispatcher
         try {
             Registry reg = LocateRegistry.getRegistry( serverAddress, serverPort);
             dispatch = (Dispatcher_Intf) reg.lookup("Dispatcher");
-            System.out.println("Success: Dispatcher at " + dispatch.getHost() + " found.\n");      
+            System.out.println("Success: Dispatcher at " + dispatch.getHost() + " found.");      
         } catch (RemoteException e) {
-            System.out.println("FAILURE: Client.java: Error connecting to Dispatcher."); 
+            System.out.println("FAILURE: Client.java: Error connecting to Dispatcher at " + serverAddress + ":" + serverPort); 
             e.printStackTrace();
         } catch (NotBoundException e) {
             System.out.println("FAILURE: Client.java: Can't find Dispatcher in server registry.");
             e.printStackTrace();
-         }/* catch (MalformedURLException e) {
-            System.out.println("FAILURE: Client.java: URL reference to server registry is malformed."); 
+         }
+        
+        // Registering client to server
+        boolean success = false;
+        try {
+            success = dispatch.register( (Client_Intf) this, localHost);
+        } catch (RemoteException e) {
+            System.out.println("FAILURE: Error connecting to Dispatcher.");
             e.printStackTrace();
-        } */
+        }
+        if (success) System.out.println("Success: Client is registered to server.");
+        else System.out.println("FAILURE: Client.java: Registration unsuccessful.");
+
+        System.out.println();
     }
 
     public void interact() {
@@ -53,7 +64,8 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         while (true) {
             System.out.println("_____");
             System.out.println("Available Actions: ");
-            System.out.println("1: Register to cluster.");
+            System.out.println("2: Print client details.");
+            //System.out.println("1: Register to cluster.");
             System.out.println("0: Exit.");
 
             try { input = Integer.parseInt( inputStream.readLine());
@@ -61,8 +73,11 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
             System.out.println("_____\n");
             
             switch (input) {
+                case 3: sm.setTask("Testing testing");
+                case 2: printDetails();
+                        break;
                 case 1: try {
-                            success = dispatch.register( (Client_Intf) this);
+                            success = dispatch.register( (Client_Intf) this, localHost);
                         } catch (RemoteException e) {
                             System.out.println("FAILURE: Error connecting to Dispatcher.");
                             e.printStackTrace();
@@ -93,6 +108,14 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
     /* Getters & Setters */
     public String getHost() {
         return localHost;
+    } 
+
+    public void printDetails() {
+        System.out.println("Host: " + localHost);
+        System.out.println();
+        sm.printTaskDetails();
+        System.out.println();
+        sm.printResourceDetails();
     } 
 
 
