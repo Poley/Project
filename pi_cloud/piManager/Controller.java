@@ -70,8 +70,9 @@ public class Controller {
         String strInput;
         while (true) {
             System.out.println("\n_________\nAvailable actions:");
+            System.out.println("1: View tasks at each client.");
             System.out.println("2: Request status update from clients."); 
-            System.out.println("1: Get tasks from each client.");
+            System.out.println("3: View Resource Stats at each client.");
             System.out.println("0: Exit.");
             
             input = -1;
@@ -80,7 +81,10 @@ public class Controller {
             System.out.println("_________"); 
 
             switch(input) {
-                case 2: cluster.requestTaskDetailUpdate();
+                case 3: if (cluster.size() > 0) cluster.printResourceStats();
+                        else System.out.println("Cluster is empty.");
+                        break;
+                case 2: cluster.requestUpdate();
                         System.out.println("Update request sent.");
                         break;
                 case 1: System.out.println("Requesting current task from each client...\n");

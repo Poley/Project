@@ -54,9 +54,9 @@ public class Cluster {
         }
     }
 
-    protected boolean updateResourceDetails(Client_Intf n, short cpuUsage, int memUsage) {
+    protected boolean updateResourceDetails(Client_Intf n, short cpuUsage, int memUsage, int DRS, int RSS, double PMEM) {
         Pi node = piCluster.get(n); // might be worth validating it exists
-        node.updateResourceDetails(cpuUsage, memUsage);
+        node.updateResourceDetails(cpuUsage, memUsage, DRS, RSS, PMEM);
         piCluster.put(n, node);
         return true;
     }
@@ -70,8 +70,8 @@ public class Cluster {
     }
     
     // Triggers Status Manager to request all clients to update their task details and reply with the update.
-    protected void requestTaskDetailUpdate() {
-        statMan.requestTaskDetailUpdate( getStatusMonitors());
+    protected void requestUpdate() {
+        statMan.requestUpdate( getStatusMonitors());
     }
     
     protected void printClusterTasks() {
@@ -84,9 +84,18 @@ public class Cluster {
 
         System.out.println("All tasks retrieved.");
     } 
-   
-    /* Getters & Setters */
+    
+    protected void printResourceStats() {
+        Pi pis[] = piCluster.values().toArray( new Pi[piCluster.size()] ); 
+        for (int i = 0; i < pis.length; i++) {
+            System.out.println("HostName: " + pis[i].getHost() ); 
+            pis[i].printResourceStats();
+        }
 
+        System.out.println("All tasks retrieved.");
+    } 
+    
+    /* Getters & Setters */
     protected HashMap<Client_Intf, Pi> getFullDetails() {
         return piCluster;
     }

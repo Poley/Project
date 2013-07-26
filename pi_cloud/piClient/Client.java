@@ -65,7 +65,7 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
             System.out.println("_____");
             System.out.println("Available Actions: ");
             System.out.println("2: Print client details.");
-            //System.out.println("1: Register to cluster.");
+            System.out.println("1: Update Resource Statistics.");
             System.out.println("0: Exit.");
 
             try { input = Integer.parseInt( inputStream.readLine());
@@ -76,16 +76,12 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
                 case 3: sm.setTask("Testing testing");
                 case 2: printDetails();
                         break;
-                case 1: try {
-                            success = dispatch.register( (Client_Intf) this, localHost);
-                        } catch (RemoteException e) {
-                            System.out.println("FAILURE: Error connecting to Dispatcher.");
-                            e.printStackTrace();
-                        }
-                        if (success) System.out.println("Registration successful.");
-                        else System.out.println("FAILURE: Registration unsuccesul.");
+                case 1: if (sm.updateResourceStats()) System.out.println("Resource stats updated."); 
                         break;
-                case 0: System.out.println("Exiting...");
+                case 0: try { 
+                            if ( dispatch.unRegister (this) ) System.out.println("Client unregistered from server. Now exiting...");
+                            else System.out.println("Error unregistering from server. Continuing to exit...");
+                        } catch (RemoteException e){};
                         System.exit(1);
                 default: System.out.println("ERROR: Entered option unavailable.");
                          continue;
