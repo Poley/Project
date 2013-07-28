@@ -21,6 +21,8 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
     private String serverAddress;
     private short serverPort; 
 
+    private MergeSorter_Intf mergeS = null;
+
     public Client(String h, String sa, short p) throws RemoteException {
         localHost = h;
         serverAddress = sa;
@@ -64,6 +66,7 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         while (true) {
             System.out.println("_____");
             System.out.println("Available Actions: ");
+            System.out.println("3: Sort test list.");
             System.out.println("2: Print client details.");
             System.out.println("1: Update Resource Statistics.");
             System.out.println("0: Exit.");
@@ -73,7 +76,7 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
             System.out.println("_____\n");
             
             switch (input) {
-                case 3: sm.setTask("Testing testing");
+                case 3: mer;
                 case 2: printDetails();
                         break;
                 case 1: if (sm.updateResourceStats()) System.out.println("Resource stats updated."); 
@@ -89,7 +92,11 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         }
     }
 
-    public boolean executeAlgorithm() throws RemoteException {
+    public boolean executeAlgorithm(String algo) throws RemoteException {
+        if ( algo.contains("merge") ) {
+            int[] entry = dispatch.getMergeSortInput();
+            mergeS.sort( entry);
+        }
         return true;
     }
 

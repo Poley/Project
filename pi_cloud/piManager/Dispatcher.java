@@ -29,19 +29,23 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
         return c.removeClient(node);
     }
 
-    // Let network know that the Pi_Manager is awake, asking them to register if active.
-    protected boolean wakeUpNetwork() {
-        return true;
+    protected void executeAlgorithm(String input) {
+        if (input.contains("merge") ){
+            for (int i = 0; i < cluster.size(); i++) {
+                clister
+            } 
+        } 
     }
 
-    protected void executeAlgorithm() {
-
+    // Define children within the network, used pre-execution of certain algorithms.
+    private void defineClusterNetwork() {
+        
     }
 
-    // Define parents and children within the network, used pre-execution of certain algorithms.
-    private void defineClusterNetworking() {
-
-    }
+    public int[] getMergeSortInput() throws RemoteException {
+        int[] input = {6,5,4,3,2,1};
+        return input;
+    } 
    
     /* Getters & Setters */
     public String getHost() throws RemoteException {
