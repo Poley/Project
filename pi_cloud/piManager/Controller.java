@@ -73,6 +73,7 @@ public class Controller {
             System.out.println("1: View tasks at each client.");
             System.out.println("2: Request status update from clients."); 
             System.out.println("3: View Resource Stats at each client.");
+            System.out.println("4: Assign each client's children.");
             System.out.println("0: Exit.");
             
             input = -1;
@@ -81,6 +82,8 @@ public class Controller {
             System.out.println("_________"); 
 
             switch(input) {
+                case 4: executeAlgorithm(""); 
+                        break;
                 case 3: if (cluster.size() > 0) cluster.printResourceStats();
                         else System.out.println("Cluster is empty.");
                         break;
@@ -99,8 +102,13 @@ public class Controller {
         } 
     } 
 
-    public void executeAlgorithm() {
-        dispatch.executeAlgorithm();
+    public void executeAlgorithm(String st) {
+        try {
+            dispatch.defineClusterNetwork( cluster.getClients() );
+            dispatch.executeAlgorithm(st, cluster.getClients() );
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
     }
 
     public boolean addClient(Client_Intf c, String hostname) {

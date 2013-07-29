@@ -118,6 +118,10 @@ public class Cluster {
         return statMons;
     }
 
+    protected Client_Intf[] getClients() {
+        return piCluster.keySet().toArray( new Client_Intf[piCluster.size()] );
+    } 
+
     protected int size() {
         return piCluster.size();
     }

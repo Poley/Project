@@ -27,6 +27,7 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         localHost = h;
         serverAddress = sa;
         serverPort = p;
+        mergeS = new MergeSorter(null, null);
         
         sm = new StatusMonitor(localHost, this);
         
@@ -61,7 +62,6 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         BufferedReader inputStream = new BufferedReader( new InputStreamReader(System.in) );
         int input = -1;
         boolean success= false;
-
             
         while (true) {
             System.out.println("_____");
@@ -75,8 +75,12 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
             } catch (Exception e) { System.out.println("ERROR: Unrecognised Input."); } 
             System.out.println("_____\n");
             
+            int[] list = {5,3,2,1,4,6,10,105,3,6,23,1,0,12};
+
             switch (input) {
-                case 3: mer;
+                case 3: try { mergeS.sort ( list);
+                        } catch (RemoteException e) { e.printStackTrace(); }
+                        break;
                 case 2: printDetails();
                         break;
                 case 1: if (sm.updateResourceStats()) System.out.println("Resource stats updated."); 
@@ -92,12 +96,12 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         }
     }
 
-    public boolean executeAlgorithm(String algo) throws RemoteException {
+    public int[] executeAlgorithm(String algo, int[] input) throws RemoteException {
         if ( algo.contains("merge") ) {
-            int[] entry = dispatch.getMergeSortInput();
-            mergeS.sort( entry);
+            int[] sorted = mergeS.sort( input);
+            return sorted;
         }
-        return true;
+        return new int[0];
     }
 
     public StatusMonitor_Intf getStatusMonitor() throws RemoteException {
@@ -121,7 +125,12 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         sm.printResourceDetails();
     } 
 
-
+    public MergeSorter_Intf getMS() throws RemoteException {
+        if (mergeS == null) {
+            mergeS = new MergeSorter(null, null);
+        }
+        return mergeS;
+    } 
     // method managing dispatcher
 
 }

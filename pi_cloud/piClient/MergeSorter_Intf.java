@@ -8,4 +8,5 @@ public interface MergeSorter_Intf extends Remote {
     public int[] sort(int[] list) throws RemoteException;
 
     public boolean setListThreshold(short t) throws RemoteException;
+    public boolean setChildren(MergeSorter_Intf ma, MergeSorter_Intf mb) throws RemoteException;
 }
