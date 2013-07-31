@@ -73,7 +73,7 @@ public class Controller {
             System.out.println("1: View tasks at each client.");
             System.out.println("2: Request status update from clients."); 
             System.out.println("3: View Resource Stats at each client.");
-            System.out.println("4: Assign each client's children.");
+            System.out.println("4: Execute merge sort (and set children).");
             System.out.println("0: Exit.");
             
             input = -1;
@@ -82,7 +82,10 @@ public class Controller {
             System.out.println("_________"); 
 
             switch(input) {
-                case 4: executeAlgorithm(""); 
+                case 4: dispatch.defineClusterNetwork( cluster.getClients() ); // define each nodes children.
+                        int[] mergeSortInput = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783,2,61,562,37,48,9,0,49,4};
+                        System.out.println("Default list of integers will be used.");
+                        dispatch.executeMergeSort(cluster.getClients(), mergeSortInput); 
                         break;
                 case 3: if (cluster.size() > 0) cluster.printResourceStats();
                         else System.out.println("Cluster is empty.");
@@ -102,34 +105,12 @@ public class Controller {
         } 
     } 
 
-    public void executeAlgorithm(String st) {
-        try {
-            dispatch.defineClusterNetwork( cluster.getClients() );
-            dispatch.executeAlgorithm(st, cluster.getClients() );
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-    }
+    public boolean addClient(Client_Intf c, String hostname) { return cluster.addClient(c, hostname); }
+    public boolean removeClient(Client_Intf c) { return cluster.removeClient(c); }
 
-    public boolean addClient(Client_Intf c, String hostname) {
-        return cluster.addClient(c, hostname);
-    }
-    
-    public boolean removeClient(Client_Intf c) {
-        return cluster.removeClient(c); 
-    }
+    public HashMap<Client_Intf, Pi> getClusterInfo() { return cluster.getFullDetails(); }
+    public void getClusterHistory() { }
 
-    public HashMap<Client_Intf, Pi> getClusterInfo() {
-        return cluster.getFullDetails();
-    }
-
-
-    public void getClusterHistory() {
-
-    }
-
-    public String getHost() {
-        return host;
-    }
+    public String getHost() { return host; }
 
 }

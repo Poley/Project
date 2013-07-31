@@ -21,14 +21,13 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
     private String serverAddress;
     private short serverPort; 
 
-    private MergeSorter_Intf mergeS = null;
+    private MergeSorter_Intf mergeS;
 
     public Client(String h, String sa, short p) throws RemoteException {
         localHost = h;
         serverAddress = sa;
         serverPort = p;
         mergeS = new MergeSorter(null, null);
-        
         sm = new StatusMonitor(localHost, this);
         
         // Acquire server's dispatcher
@@ -66,9 +65,8 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         while (true) {
             System.out.println("_____");
             System.out.println("Available Actions: ");
-            System.out.println("3: Sort test list.");
-            System.out.println("2: Print client details.");
             System.out.println("1: Update Resource Statistics.");
+            System.out.println("2: Print client details.");
             System.out.println("0: Exit.");
 
             try { input = Integer.parseInt( inputStream.readLine());
@@ -78,9 +76,6 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
             int[] list = {5,3,2,1,4,6,10,105,3,6,23,1,0,12};
 
             switch (input) {
-                case 3: try { mergeS.sort ( list);
-                        } catch (RemoteException e) { e.printStackTrace(); }
-                        break;
                 case 2: printDetails();
                         break;
                 case 1: if (sm.updateResourceStats()) System.out.println("Resource stats updated."); 
@@ -96,26 +91,9 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         }
     }
 
-    public int[] executeAlgorithm(String algo, int[] input) throws RemoteException {
-        if ( algo.contains("merge") ) {
-            int[] sorted = mergeS.sort( input);
-            return sorted;
-        }
-        return new int[0];
+    public int[] executeMergeSort(int[] input) throws RemoteException {
+        return mergeS.sort( input);
     }
-
-    public StatusMonitor_Intf getStatusMonitor() throws RemoteException {
-        return sm;
-    }
-
-    public boolean test() {
-        return true;
-    }
-
-    /* Getters & Setters */
-    public String getHost() {
-        return localHost;
-    } 
 
     public void printDetails() {
         System.out.println("Host: " + localHost);
@@ -125,12 +103,9 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         sm.printResourceDetails();
     } 
 
-    public MergeSorter_Intf getMS() throws RemoteException {
-        if (mergeS == null) {
-            mergeS = new MergeSorter(null, null);
-        }
-        return mergeS;
-    } 
-    // method managing dispatcher
+    /* Getters & Setters */
+    public String getHost() { return localHost; } 
+    public StatusMonitor_Intf getStatusMonitor() throws RemoteException { return sm; }
+    public MergeSorter_Intf getMS() throws RemoteException { return (MergeSorter_Intf) mergeS; } 
 
 }

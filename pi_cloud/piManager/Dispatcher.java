@@ -10,6 +10,8 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
     Controller c;
     ArrayList<String> ipAddresses = new ArrayList<String>();
 
+    MergeSorter_Intf master = null;
+
     public Dispatcher(Controller contr) throws RemoteException {
         super(); 
         c = contr;
@@ -29,16 +31,14 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
         return c.removeClient(node);
     }
 
-    protected void executeAlgorithm(String alg, Client_Intf[] clients) {
-        
-        int[] input = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783733,2,61,562,37,48,9,0,49,4};
-        try { 
-            int[] sorted = clients[0].executeAlgorithm("merge", input); 
+    protected void executeMergeSort(Client_Intf[] clients, int[] input) {
+        int[] sorted = new int[input.length];
+        try {
+            if (clients.length > 0) sorted = clients[0].getMS().sort(input);
             System.out.println("\nInput:") ;
             for (int i : input) System.out.print(" " + i);
-            System.out.println("\nSorted:");
+            System.out.println("\n\nSorted:");
             for (int j : sorted) System.out.print(" " + j);
-            
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -46,30 +46,25 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
 
     // Define children within the network, used pre-execution of certain algorithms.
     protected void defineClusterNetwork(Client_Intf[] clients) {
-        try {
-            for (int i = 0; i < clients.length; i=i+3) {
-                MergeSorter_Intf msi = clients[i].getMS();
-                msi.setChildren( clients[i+1].getMS(), clients[i].getMS() );
+        System.out.println("Defining network. Clients size = " + clients.length);
+        
+        for (int i = 0; i < clients.length; i++) {
+           try {
+               if ( ((clients.length) - i) > 2) { // two children avilable to be assigned
+                    clients[i].getMS().setChildren( clients[i+1].getMS(), clients[i+2].getMS() );
+                    i=i+2;
+                } else if ( ((clients.length)-i) == 2 ) { // only one child available to be assigned
+                    clients[i].getMS().setChildren( clients[i+1].getMS(), null);
+                    i++;
+                } 
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                System.out.println("FAILURE: Dispatcher.java: Error connecting to client MergeSorter.");
             } 
-        } catch (Exception e) {
-            e.printStackTrace();
         } 
     }
 
-    public int[] getMergeSortInput() throws RemoteException {
-        int[] input = {6,5,4,3,2,1};
-        return input;
-    } 
-   
     /* Getters & Setters */
-    public String getHost() throws RemoteException {
-        return c.getHost();
-    } 
-
-    /* ------- test methods -------- */
-    protected boolean testRegistration() {
-        // connect to 'remote' object of client
-        return true;
-    }
+    public String getHost() throws RemoteException { return c.getHost(); } 
 
 }

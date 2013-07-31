@@ -42,43 +42,4 @@ public class initClient {
 
     } 
 
-
-        //client.interact();
-        
-        /*
-        // Setting up RMI Objects
-        try { LocateRegistry.createRegistry( port); }
-        catch (Exception e) { e.printStackTrace(); }
-
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new RMISecurityManager() );
-            System.out.println("Success: Security Manager created.");
-        } 
-
-        try {
-            client = new Client(host, port);
-            
-            try {UnicastRemoteObject.unexportObject(client, true); }
-            catch (Exception e) {};
-            registryStub = (Client_Intf) UnicastRemoteObject.exportObject(client, port);
-            System.out.println("Success: Client exported to registry.");
-           
-            String rmiRef = "rmi://" + host + ":" + port + "/Client";
-
-            try { Naming.unbind( rmiRef);
-            } catch (NotBoundException e) {}
-            Naming.rebind( rmiRef, registryStub);
-            
-            System.out.println("Success: Client bound to reference at: \"" + rmiRef + "\"");
-            System.out.println("Success: Client initialised.");
-        } catch (RemoteException e) {
-            System.out.println("FAILURE: Client.java: Error exporting Client to registry.");
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            System.out.println("FAILURE: Client.java: URL binding the Client object is malformed.");
-            e.printStackTrace();
-        }
-        */
-        
-
 } 
