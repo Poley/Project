@@ -1,0 +1,158 @@
+body 
+  background-color #FFEDA7
+  font-size 16px
+  margin 0
+  padding 0 
+
+// Base and main Container ______________________________
+#base
+  width 97%
+  height:97%
+  
+  margin-right auto
+  margin-left auto
+  margin-top 1em
+  margin-bottom .5em
+  background-color #333
+  
+  -webkit-border-radius 18px
+  -moz-border-radius 18px
+  border-style solid 
+  border-color #333
+  border-width 2px
+  border-bottom 0
+
+// Page header __________________________________________
+#header 
+  background-color #333 
+  height 1.6em
+  color: #fff
+  
+  font-size 30px
+  padding-left: 0.3em
+  padding-top: 0.2em
+  
+  -webkit-border-top-left-radius inherit
+  -webkit-border-top-right-radius inherit
+  -moz-border-top-left-radius inherit
+  -moz-border-top-right-radius inherit
+
+// Top menu bar _________________________________________
+#top
+  width 100% 
+  background-color #dc8 
+  height 1.8em /* for modern browsers */
+  font 17px Helvetica, Verdana, sans-serif;
+  
+  ul
+    list-style-type none
+    overflow auto    
+    margin 0
+    padding-top .3em
+    padding-left .6em
+    padding-bottom 0
+  
+  li a 
+    float left
+    text-decoration: none;
+    color: #333;
+    padding-right 2em
+
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    -ms-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+
+  li a:hover 
+    color: #667F6D;
+
+  li.active a 
+    font-weight: bold;
+    color: #667F6D;
+// Content container ____________________________________
+#center  
+  background-color #eec 
+  min-height 550px /* for modern browsers */
+  height 100% !important; /* for modern browsers */
+  height 550px /* for IE5.x and IE6 */
+  
+  padding-bottom 2em // make sure this is equal to footer margin top
+  padding-top .5em
+  padding-left .5em
+  padding-right .8em
+  
+  -webkit-border-bottom-left-radius inherit
+  -webkit-border-bottom-right-radius inherit
+  -moz-border-bottom-left-radius inherit
+  -moz-border-bottom-right-radius inherit
+
+// Footer _______________________________________________
+#footer 
+  position relative
+  clear both
+  background-color #333
+  height 2em
+  z-index 10
+  color #fff
+  
+  margin-top -2em // make sure equal to center margin bottom
+  padding 0.8em
+  padding-bottom 0
+  padding-top 0.3em
+  
+  -webkit-border-bottom-left-radius inherit
+  -webkit-border-bottom-right-radius inherit
+  -moz-border-bottom-left-radius inherit
+  -moz-border-bottom-right-radius inherit
+
+// Visualisation classes ________________________________
+.link
+  fill none
+  stroke #ccc
+  stroke-width 1.5px
+  shape-rendering geometricPrecision
+ 
+.circle
+  stroke steelblue
+  fill steelblue
+  stroke-width 0.5pc
+  r 6
+
+.stats
+  font-size 13px
+
+.name
+  font-size 16px
+  font-weight bold
+
+// Miscellaneous __________________________________________
+.configForm 
+  float left
+  text-align right
+  margin-left .2em
+
+  label
+    margin-right .32em
+  
+  input
+    width 70px
+    margin .25em
+
+#submitButton 
+  -webkit-border-radius 5px
+  -webkit-transition: all 0.2s ease
+  -moz-border-radius 5px
+  -moz-transition: all 0.2s ease
+
+#submitButton:hover
+  background-color #334037
+  color #fff
+
+h1
+  margin-top .3em
+  margin-left .2em
+
+input[type=text]
+  -webkit-border-radius 7px
+  -moz-border-radius 3px

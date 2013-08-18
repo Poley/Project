@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    h1 Input Page
+    
+    form(name="inputForm", method="post").inputForm
+      div
+        label(for="inputText") Please input the values you wish to be entered to the input list.
+        input(type=number, name="inputText")
