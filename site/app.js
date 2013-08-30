@@ -5,6 +5,9 @@ var index = require('./routes/index');
 var http = require('http');
 var path = require('path');
 
+//var io = require('socket.io');
+//var socket = io.connect('http://localhost');
+
 var app = express();
 
 // all environments
@@ -21,17 +24,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // js scripts that are required in all pages.
 app.locals.globalScripts = ['/javascripts/libraries/jquery-1.10.2.js']; 
+app.locals.globalList = [1,2,3,4,5];
 
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
+globalList = [1,2];
+
 app.get('/', index.home);
 app.get('/merge_sort', index.mergeSort_Home);
+
 app.get('/merge_sort/config', index.mergeSort_Configuration);
 app.post('/merge_sort/config', index.mergeSort_Configuration_postHandler);
+
 app.get('/merge_sort/input', index.mergeSort_Input);
+app.post('/merge_sort/input', index.mergeSort_Input_postHandler);
+
 app.get('/merge_sort/visualisation', index.mergeSort_Visualisation);
 app.get('/merge_sort/graphs', index.mergeSort_Graphs);
 
