@@ -14,19 +14,20 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     private StatusManager_Intf statMan;
     private Client_Intf client;
     private String localHost;
-    private String task = "inactive";
+    private long taskId = 12345;
+    private String taskType = "inactive";
     private String taskStatus = "inactive";
-    private short taskTTC = -1;
+    private short taskTTC = 0;
     private byte algID; // ID identifying which algorithm is being executed
     
-    private short taskRefreshRate = -1; // 0 means no refresh, all updates are executed manually.
+    private short taskRefreshRate = 0; // 0 means no refresh, all updates are executed manually.
 
-    private short cpuUsage = -1;
-    private int memUsage = -1;
-    private int DRS = -1; // Data Resident Size.
-    private int RSS= -1; // Resident Set Size.
-    private double PMEM = -1; // % RAM used.
-    private short resourceRefreshRate = -1;
+    private short cpuUsage = 0;
+    private int memUsage = 0;
+    private int DRS = 0; // Data Resident Size.
+    private int RSS= 0; // Resident Set Size.
+    private short PMEM = 0; // % RAM used.
+    private short resourceRefreshRate = 0;
 
     public StatusMonitor(String lh, Client_Intf cli) throws RemoteException {
         localHost = lh;
@@ -37,8 +38,8 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
         statMan = sm;
     }
     
-    public String getTask() throws RemoteException { return task; }
-    protected void setTask(String t) { task = t; } 
+    public String getTaskType() throws RemoteException { return taskType; }
+    protected void setTaskType(String t) { taskType = t; } 
     public String getTaskStatus() throws RemoteException{ return taskStatus; }
     public short taskTTC() throws RemoteException { return taskTTC; }
     public byte getActiveAlgorithm() throws RemoteException { return algID; }
@@ -55,16 +56,15 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     }
     public String getHost() throws RemoteException { return localHost; }
     
-
     /* Called by server to request update on Status Monitor statistics. */
     public void updateServer() throws RemoteException { 
-        statMan.updateTaskDetails(client, task, taskStatus, taskTTC);
+        statMan.updateTaskDetails(client, taskId, taskType, taskStatus, taskTTC);
         statMan.updateResourceDetails(client, cpuUsage, memUsage, DRS, RSS, PMEM);
     }
 
     /* Printing methods */
     protected void printTaskDetails(){
-        System.out.println("Task: " + task);
+        System.out.println("Task Type: " + taskType);
         System.out.println("Task Status: " + taskStatus);
         System.out.println("Task TTC: " + taskTTC);
         System.out.println("Task Refresh Rate: "+ taskRefreshRate);
@@ -102,7 +102,7 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
                             continue;
                     case 8: RSS = Integer.parseInt(res[i]);
                             continue;
-                    case 9: PMEM = Double.parseDouble(res[i]);
+                    case 9: PMEM = Short.parseShort(res[i]);
                             continue;
                     default: continue;
                 }

@@ -7,22 +7,25 @@ public class Pi {
     //private Client_Intf node;
     private StatusMonitor_Intf statMon;
     private String host;
-    private String task = "Inactive";
-    private String taskStatus = "Inactive";
-    private int ttc = -1;
 
-    private short cpuUsage = -1;
-    private int memUsage = -1;
-    private int DRS = -1;
-    private int RSS = -1;
-    private double PMEM = -1;
+    private long taskId = 12345;
+    private String taskType = "Inactive";
+    private String taskStatus = "Inactive";
+    private int ttc = 0;
+
+    private short cpuUsage = 0;
+    private int memUsage = 0;
+    private int DRS = 0;
+    private int RSS = 0;
+    private short PMEM = 0; // process memory
+
 
     protected Pi(StatusMonitor_Intf statM, String hostname) {
         statMon = statM;
         host = hostname;
     }
 
-    protected boolean updateResourceDetails(short cpu, int mem, int dr, int rs, double pm) {
+    protected boolean updateResourceDetails(short cpu, int mem, int dr, int rs, short pm) {
         cpuUsage = cpu;
         memUsage = mem;
         DRS = dr;
@@ -31,8 +34,9 @@ public class Pi {
         return true;
     }
 
-    protected boolean updateTaskDetails(String t, String ts, int ttComplete) {
-        task = t;
+    protected boolean updateTaskDetails(long tId, String tt, String ts, int ttComplete) {
+        taskId = tId;
+        taskType = tt;
         taskStatus = ts;
         ttc = ttComplete;
         return true;
@@ -43,17 +47,14 @@ public class Pi {
         return true;
     }
 
-    protected StatusMonitor_Intf getStatusMonitor() {
-        return statMon;
-    }
+    protected StatusMonitor_Intf getStatusMonitor() { return statMon; }
 
-    protected String getHost() {
-        return host;
-    }
+    protected String getHost() { return host; }
 
-    protected String getTask() {
-        return task;
-    } 
+    protected long getTaskId() { return taskId; }
+    protected String getTaskType() { return taskType; } 
+    protected String getTaskStatus() { return taskStatus; }
+    protected short getPMem() { return PMEM; };
 
     protected void printResourceStats() {
         System.out.println("\tDRS: " + DRS + " kb");

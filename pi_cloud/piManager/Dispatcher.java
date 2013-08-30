@@ -31,17 +31,20 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
         return c.removeClient(node);
     }
 
-    protected void executeMergeSort(Client_Intf[] clients, int[] input) {
+    // Returns time-to-execute
+    protected int[] executeMergeSort(Client_Intf[] clients, int[] input) {
         int[] sorted = new int[input.length];
         try {
-            if (clients.length > 0) sorted = clients[0].getMS().sort(input);
-            System.out.println("\nInput:") ;
-            for (int i : input) System.out.print(" " + i);
-            System.out.println("\n\nSorted:");
-            for (int j : sorted) System.out.print(" " + j);
+            if (clients.length > 0) {
+                long startTime = System.nanoTime();
+                sorted = clients[0].getMS().sort(input);
+                long endTime = System.nanoTime();
+                long tte = endTime - startTime;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } 
+        return sorted;
     }
 
     // Define children within the network, used pre-execution of certain algorithms.
