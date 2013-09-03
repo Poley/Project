@@ -19,16 +19,19 @@ import java.sql.PreparedStatement;
 
 import java.io.*; // may not need this
 
+import org.java_websocket.server.*;
+import org.java_websocket.server.DefaultWebSocketServerFactory;
+
 public class Controller {
     
     private Cluster cluster;
     private Dispatcher dispatch;
-    private Connection connection;
+    private Connection dbConnection; // Connection to database
 
     private String host; 
     private short port = 1099;
 
-    private ServerSocket serverSocket = null;
+    private PiServerSocket server = null;
     private PrintWriter outputRoute = null;
     private BufferedReader inputRoute = null;
 
@@ -58,7 +61,7 @@ public class Controller {
         // Connecting to database
         try {
             // Connects to the database named "pi_cloud" on the local server.
-            connection = DriverManager.getConnection("jdbc:mysql://localhost/pi_cloud" + "?user=piAdmin&password=pi_cloud");
+            dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/pi_cloud" + "?user=piAdmin&password=pi_cloud");
             System.out.println("Success: Connection to database established.");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,6 +70,7 @@ public class Controller {
         } 
         
         // Set up server socket for front-end to communicate with
+        /*
         short socketPort = 4444;
         try {
             serverSocket = new ServerSocket(socketPort);
@@ -76,11 +80,12 @@ public class Controller {
             System.out.println("FAILURE: Server Socket can't listen on port " + socketPort); 
             System.exit(1);
         } 
-
+        */
+        
         // Setting up RMI
         try {
             Registry reg = LocateRegistry.createRegistry( port);
-            cluster = new Cluster(host, port, reg, connection); // cluster exports and binds status manager
+            cluster = new Cluster(host, port, reg, dbConnection); // cluster exports and binds status manager
             
             dispatch = new Dispatcher(this);
             UnicastRemoteObject.unexportObject(dispatch, true);
@@ -95,7 +100,48 @@ public class Controller {
             System.out.println("FAILURE: Controller.java: Error exporting dispatcher to registry.");
             e.printStackTrace();
         }
+
+        connectAndListenToPort();
     }
+
+    public void connectAndListenToPort() {
+        try {
+            server = new PiServerSocket( new InetSocketAddress("localhost", 4444) );
+            System.out.println( server.getAddress() );
+            
+            server.setWebSocketFactory( new DefaultWebSocketServerFactory() );
+            
+            server.start();
+        } catch (Exception e) { 
+            e.printStackTrace();
+        }
+    } 
+
+    /*
+    private void listenOnSocket() {
+        try {
+            Socket sock = serverSocket.accept();
+            System.out.println("\nRecieved a request: ");
+            
+            BufferedReader inputRoute =  new BufferedReader( new InputStreamReader( sock.getInputStream() ) );
+            String in = inputRoute.readLine();
+            while (!in.isEmpty()) { // Empty line indicates end of message (buffered reader removes terminating characters "\r\n")
+                System.out.println(in);
+                in = inputRoute.readLine();
+            }
+
+            PrintWriter outputRoute = new PrintWriter( sock.getOutputStream(), true);
+            outputRoute.println("connect");
+
+            inputRoute.close();
+            outputRoute.close();
+            sock.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        } 
+    } 
+    */
 
     public static void main(String args[]) {
         Controller c = new Controller();
@@ -125,7 +171,7 @@ public class Controller {
             switch(input) { 
                 case 6: String eventStmtText = "SELECT * FROM Event";
                         try {
-                            PreparedStatement eventPStmt = connection.prepareStatement(eventStmtText);
+                            PreparedStatement eventPStmt = dbConnection.prepareStatement(eventStmtText);
                             ResultSet eventRs = eventPStmt.executeQuery();
                             
                             int row = 1;
@@ -190,7 +236,7 @@ public class Controller {
                         try {
                             //outputRoute.close();
                             //inputRoute.close();
-                            serverSocket.close();
+                            server.closeConnections();
                         } catch (Exception e) { 
                             e.printStackTrace(); 
                             System.out.println("FAILURE: Error closing socket and streams."); 
