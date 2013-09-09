@@ -2,14 +2,12 @@ extends layout
 
 block content
     h1#headerTwo Input Page ( input = [#{gList}] )
-   
-    script
-      var socket = io.connect("http://localhost");
-
+    
     form(name="inputForm", method="post").configForm
       div
         label(for="inputText") Please input the values you wish to be entered to the input list (separated by a space).
-        input(type=number, name="updatedList")
       div
-        input(type="submit", name="submitButton")#newListSubmitButton 
-
+        textarea(type=number, name="updatedList", value="12 3 45")
+      div
+        input(type="submit", name="randomListButton", value="Create Random List")
+        input(type="submit", name="submitButton", value="Execute Merge Sort")

@@ -9,13 +9,15 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf, Serializable {
 
+    private String hostname;
     private MergeSorter_Intf childA = null;
     private MergeSorter_Intf childB = null;
     private short listThreshold = 5; // List size defining when the list should just be sorted locally rather than being distributed to children. 
 
-    public MergeSorter( MergeSorter_Intf a, MergeSorter_Intf b) throws RemoteException {
+    public MergeSorter( MergeSorter_Intf a, MergeSorter_Intf b, String h) throws RemoteException {
         childA = a;
         childB = b;
+        hostname = h;
     } 
 
     public int[] sort(int[] list) throws RemoteException {
@@ -95,7 +97,23 @@ public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf
         return sortedList;
     } 
 
+    public String[] getChildHostnames() throws RemoteException{
+        String[] childrenString = new String[0];
+
+        if (childA != null && childB != null) {
+            childrenString = new String[2];
+            childrenString[0] = childA.getHostname();
+            childrenString[1] = childB.getHostname();
+        } else if (childA != null ^ childB != null) {
+            childrenString = new String[1];
+            if (childA != null) childrenString[0] = childA.getHostname();
+            else childrenString[0] = childB.getHostname();
+        }
+        return childrenString;
+    } 
+
     // getters & setters
+    public String getHostname() throws RemoteException { return hostname; }
     public void setListThreshold(short t) throws RemoteException { listThreshold = t; }
     
     public void setChildren(MergeSorter_Intf ma, MergeSorter_Intf mb) throws RemoteException { childA = ma; childB = mb; } 

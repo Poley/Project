@@ -5,9 +5,6 @@ var index = require('./routes/index');
 var http = require('http');
 var path = require('path');
 
-//var io = require('socket.io');
-//var socket = io.connect('http://localhost');
-
 var app = express();
 
 // all environments
@@ -24,15 +21,44 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // js scripts that are required in all pages.
 app.locals.globalScripts = ['/javascripts/libraries/jquery-1.10.2.js']; 
-app.locals.globalList = [1,2,3,4,5];
 
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
-globalList = [1,2];
+// Global list manipulated by web app.
+globalList = [1,2,3];
+resultList = [0];
 
+// Establishing connection to back-end Pi Manager.
+webSocket = require('faye-websocket');
+ws = new webSocket.Client('ws://localhost:4444' );
+
+ws.on('open', function(event){
+            console.log('Connection to PiManager has been made.\n');
+        });
+
+ws.on('message', function(event) {
+            console.log('Message Recieved: ', event.data);
+            splitMessage = event.data.split("|");
+
+            if (splitMessage[0]=="mergesort") { // "mergesort|optcode|distributed/single|tte|resultList"
+                if (splitMessage[1]=="2") { // merge sort response
+                    // skip checking single / distributed
+                    var tte = splitMessage[3]
+                    resultList = splitMessage[4];
+                } 
+            } 
+        });
+
+ws.on('close', function(event) {
+            console.log('close', ", code: " + event.code, ", reason:" + event.reason);
+            ws = null;
+        }); 
+
+
+// Creating routes for each page.
 app.get('/', index.home);
 app.get('/merge_sort', index.mergeSort_Home);
 
@@ -48,3 +74,5 @@ app.get('/merge_sort/graphs', index.mergeSort_Graphs);
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
     });
+
+

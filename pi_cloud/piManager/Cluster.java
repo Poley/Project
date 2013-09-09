@@ -40,7 +40,7 @@ public class Cluster {
             statMan.setClientsStatusManager( newP.getStatusMonitor());
             piCluster.put(n, newP);
 
-            System.out.println( "Cluster.java: Client at " + n.getHost() + " added to cluster...\n____");
+            System.out.println( "Cluster.java: Client at " + n.getHostname() + " added to cluster...\n____");
         } catch (Exception e) { 
             System.out.println( "FAILURE: Cluster.java: Error adding client to cluster.");
             e.printStackTrace(); 

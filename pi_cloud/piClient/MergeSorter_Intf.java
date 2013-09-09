@@ -9,4 +9,6 @@ public interface MergeSorter_Intf extends Remote {
     public void setListThreshold(short t) throws RemoteException;
     public void setChildren(MergeSorter_Intf ma, MergeSorter_Intf mb) throws RemoteException;
     public boolean hasChildren() throws RemoteException; 
+    public String[] getChildHostnames() throws RemoteException;
+    public String getHostname() throws RemoteException;
 }

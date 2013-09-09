@@ -1,7 +1,8 @@
 package pi_cloud.piManager;
+import pi_cloud.piClient.*;
 
 import java.util.ArrayList;
-import pi_cloud.piClient.*;
+import java.util.HashMap;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -19,7 +20,7 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
 
     public boolean register(Client_Intf node, String hostname) throws RemoteException {
         try {
-            System.out.println("___\nDispatcher.java: Registration request recieved from " + node.getHost() + ".");
+            System.out.println("___\nDispatcher.java: Registration request recieved from " + node.getHostname() + ".");
         } catch (Exception e) {
             System.out.println("Dispatcher.java: Error calling node.getHost() server-side.");
             e.printStackTrace();
@@ -55,6 +56,7 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
            try {
                if ( ((clients.length) - i) > 2) { // two children avilable to be assigned
                     clients[i].getMS().setChildren( clients[i+1].getMS(), clients[i+2].getMS() );
+
                     i=i+2;
                 } else if ( ((clients.length)-i) == 2 ) { // only one child available to be assigned
                     clients[i].getMS().setChildren( clients[i+1].getMS(), null);
@@ -66,6 +68,21 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
             } 
         } 
     }
+
+    protected HashMap<String, String[]> getClusterNetwork(Client_Intf[] clients) {
+        
+        HashMap<String, String[]> clusterNetwork = new HashMap<String, String[]>();
+        
+        try {    
+            for (int i = 0; i < clients.length; i++) {
+                String[] childHostnames = clients[i].getMSChildHostnames();
+                clusterNetwork.put(clients[i].getHostname(), childHostnames);
+            } 
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } 
+        return clusterNetwork;
+    } 
 
     /* Getters & Setters */
     public String getHost() throws RemoteException { return c.getHost(); } 

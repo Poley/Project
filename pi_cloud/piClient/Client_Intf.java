@@ -7,6 +7,7 @@ public interface Client_Intf extends Remote {
     public int[] executeMergeSort(int[] input) throws RemoteException;
     
     public StatusMonitor_Intf getStatusMonitor() throws RemoteException;
-    public String getHost() throws RemoteException;
+    public String getHostname() throws RemoteException;
     public MergeSorter_Intf getMS() throws RemoteException;
+    public String[] getMSChildHostnames() throws RemoteException;
 }

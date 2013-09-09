@@ -106,7 +106,7 @@ public class Controller {
 
     public void connectAndListenToPort() {
         try {
-            server = new PiServerSocket( new InetSocketAddress("localhost", 4444) );
+            server = new PiServerSocket( new InetSocketAddress("localhost", 4444), this );
             System.out.println( server.getAddress() );
             
             server.setWebSocketFactory( new DefaultWebSocketServerFactory() );
@@ -117,31 +117,18 @@ public class Controller {
         }
     } 
 
-    /*
-    private void listenOnSocket() {
-        try {
-            Socket sock = serverSocket.accept();
-            System.out.println("\nRecieved a request: ");
-            
-            BufferedReader inputRoute =  new BufferedReader( new InputStreamReader( sock.getInputStream() ) );
-            String in = inputRoute.readLine();
-            while (!in.isEmpty()) { // Empty line indicates end of message (buffered reader removes terminating characters "\r\n")
-                System.out.println(in);
-                in = inputRoute.readLine();
-            }
+    protected int[] executeAlgorithm(int[] mergeSortInput) {
+        System.out.println("\nInput:") ;
+        for (int i : mergeSortInput) System.out.print(" " + i);
 
-            PrintWriter outputRoute = new PrintWriter( sock.getOutputStream(), true);
-            outputRoute.println("connect");
+        dispatch.defineClusterNetwork( cluster.getClients() ); // define each nodes children.
+        int[] result = dispatch.executeMergeSort(cluster.getClients(), mergeSortInput); 
 
-            inputRoute.close();
-            outputRoute.close();
-            sock.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        } 
+        System.out.println("\nSorted List: ");
+        for (int j : result) System.out.print(" " + j);
+
+        return result;
     } 
-    */
 
     public static void main(String args[]) {
         Controller c = new Controller();
@@ -246,6 +233,10 @@ public class Controller {
                         continue;
             } 
         } 
+    } 
+
+    public HashMap<String, String[]> getClusterNetwork() {
+        return dispatch.getClusterNetwork(cluster.getClients() );
     } 
 
     public boolean addClient(Client_Intf c, String hostname) { return cluster.addClient(c, hostname); }

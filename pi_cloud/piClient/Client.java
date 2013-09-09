@@ -27,7 +27,7 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         localHost = h;
         serverAddress = sa;
         serverPort = p;
-        mergeS = new MergeSorter(null, null);
+        mergeS = new MergeSorter(null, null, h);
         sm = new StatusMonitor(localHost, this);
         
         // Acquire server's dispatcher
@@ -103,8 +103,18 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         sm.printResourceDetails();
     } 
 
+    public String[] getMSChildHostnames() { 
+        try {
+            String[] children = mergeS.getChildHostnames();
+            return children;
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } 
+        return new String[0];
+     }
+
     /* Getters & Setters */
-    public String getHost() { return localHost; } 
+    public String getHostname() { return localHost; } 
     public StatusMonitor_Intf getStatusMonitor() throws RemoteException { return sm; }
     public MergeSorter_Intf getMS() throws RemoteException { return (MergeSorter_Intf) mergeS; } 
 

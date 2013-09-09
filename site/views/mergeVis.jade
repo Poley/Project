@@ -1,6 +1,17 @@
 extends layout
 
 block content
+  
+  div.eventForm
+    div#inputDiv
+      p Input: [#{gList}] 
+      p Output: [#{rList}]
+    
+    div#eventDiv
+      input(type="submit", name="prevEventB", value="Prev")#submitButton
+      a Event 1/n
+      input(type="submit", name="nextEventB", value="Next")#submitButton
+
   -each script in scripts
     script(type="text/javascript", src=script)
 

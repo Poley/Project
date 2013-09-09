@@ -18,10 +18,11 @@ exports.mergeSort_Home = function (req, res) {
 exports.mergeSort_Input = function (req, res) {
         res.render('mergeInput', { title: "Merge Sort - Input",
                                    stylesheetRef: "/stylesheets/mergeSort.css",
-                                   gList: globalList,
-                                   scripts: ["socket.io/socket.io.js"]
+                                   gList: globalList
+                                   //scripts: ["/socket.io/index.js", "http://localhost:3000/socket.io/socket.io.js"] 
                                  });
     };
+
 exports.mergeSort_Input_postHandler = function (req, res) {
         var splitList = (req.body.updatedList.trim()).split(" ");
         var checkedList = new Array();
@@ -33,7 +34,21 @@ exports.mergeSort_Input_postHandler = function (req, res) {
              else error=true
         } 
         globalList = checkedList; // updating the global variable to the list of that defined in the post request
-        res.redirect('/merge_sort/input');
+        console.log(checkedList);
+        
+        ws.send("getClusterNetwork|1|");
+        ws.send("mergesort|1|2|" + checkedList);
+        res.redirect('/merge_sort/visualisation');
+    }; 
+
+// VISUALISATION page
+exports.mergeSort_Visualisation = function (req, res) {
+        res.render('mergeVis', { title: "Merge Sort - Visualisation",
+                                  stylesheetRef: "/stylesheets/mergeSort.css",
+                                  scripts: ["/javascripts/libraries/d3.v3.min.js", "/javascripts/visualisation/visualisation.js"],
+                                  gList: globalList,
+                                  rList: resultList
+                                  } );
     }; 
 
 // CONFIGURATION page
@@ -57,10 +72,4 @@ exports.mergeSort_Graphs = function (req, res) {
                                  } );
     } ;
 
-// VISUALISATION page
-exports.mergeSort_Visualisation = function (req, res) {
-        res.render('mergeVis', { title: "Merge Sort - Visualisation",
-                                  stylesheetRef: "/stylesheets/mergeSort.css",
-                                  scripts: ["/javascripts/libraries/d3.v3.min.js", "/javascripts/visualisation/visualisation.js"]
-                                  } );
-    }; 
+

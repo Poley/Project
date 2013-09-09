@@ -70,6 +70,7 @@ body
   li.active a 
     font-weight: bold;
     color: #667F6D;
+
 // Content container ____________________________________
 #center  
   background-color #eec 
@@ -129,15 +130,40 @@ body
 // Miscellaneous __________________________________________
 .configForm 
   float left
-  text-align right
   margin-left .2em
 
   label
     margin-right .32em
   
-  input
-    width 70px
-    margin .25em
+  input[name="submitButton"]
+    margin .3em
+    margin-left .5em
+    width 37em
+
+  input[name="randomListButton"]
+    margin .3em
+    margin-left .5em
+    margin-right .5em
+    width 14em
+  
+  textarea
+    margin-top .5em
+    height 13em
+    width 52em
+    resize none
+
+.eventForm // visualisation page
+  float left
+  width 100%
+
+  #eventDiv
+    float right
+    height 2.2em
+    font-size 20px
+    
+    a
+      padding-left .4em
+      padding-right .4em
 
 #submitButton 
   -webkit-border-radius 5px
