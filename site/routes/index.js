@@ -19,7 +19,6 @@ exports.mergeSort_Input = function (req, res) {
         res.render('mergeInput', { title: "Merge Sort - Input",
                                    stylesheetRef: "/stylesheets/mergeSort.css",
                                    gList: globalList
-                                   //scripts: ["/socket.io/index.js", "http://localhost:3000/socket.io/socket.io.js"] 
                                  });
     };
 
@@ -36,6 +35,7 @@ exports.mergeSort_Input_postHandler = function (req, res) {
         globalList = checkedList; // updating the global variable to the list of that defined in the post request
         console.log(checkedList);
         
+        visReady = false; // Indicates that an executiong of the merge sort is in progress
         ws.send("getClusterNetwork|1|");
         ws.send("mergesort|1|2|" + checkedList);
         res.redirect('/merge_sort/visualisation');

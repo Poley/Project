@@ -33,12 +33,13 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
     }
 
     // Returns time-to-execute
-    protected int[] executeMergeSort(Client_Intf[] clients, int[] input) {
+    protected int[] executeMergeSort(long taskID, Client_Intf[] clients, int[] input) {
         int[] sorted = new int[input.length];
+
         try {
             if (clients.length > 0) {
                 long startTime = System.nanoTime();
-                sorted = clients[0].getMS().sort(input);
+                sorted = clients[0].getMS().sort(taskID, input);
                 long endTime = System.nanoTime();
                 long tte = endTime - startTime;
             }
@@ -49,14 +50,13 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
     }
 
     // Define children within the network, used pre-execution of certain algorithms.
-    protected void defineClusterNetwork(Client_Intf[] clients) {
-        System.out.println("Defining network. Clients size = " + clients.length);
-        
+    protected void defineClusterNetwork(Client_Intf[] clients, int listLength) {
+        System.out.println("Clients available = " + clients.length);
+
         for (int i = 0; i < clients.length; i++) {
            try {
                if ( ((clients.length) - i) > 2) { // two children avilable to be assigned
                     clients[i].getMS().setChildren( clients[i+1].getMS(), clients[i+2].getMS() );
-
                     i=i+2;
                 } else if ( ((clients.length)-i) == 2 ) { // only one child available to be assigned
                     clients[i].getMS().setChildren( clients[i+1].getMS(), null);
@@ -70,7 +70,6 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
     }
 
     protected HashMap<String, String[]> getClusterNetwork(Client_Intf[] clients) {
-        
         HashMap<String, String[]> clusterNetwork = new HashMap<String, String[]>();
         
         try {    

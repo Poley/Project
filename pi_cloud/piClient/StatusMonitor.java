@@ -14,9 +14,11 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     private StatusManager_Intf statMan;
     private Client_Intf client;
     private String localHost;
-    private long taskId = 12345;
+    private long taskID = 12345;
     private String taskType = "inactive";
     private String taskStatus = "inactive";
+    private String input = "empty";
+    private String output = "empty";
     private short taskTTC = 0;
     private byte algID; // ID identifying which algorithm is being executed
     
@@ -37,10 +39,21 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     public void setStatusManager(StatusManager_Intf sm) throws RemoteException {
         statMan = sm;
     }
+
+    public long getTaskID() throws RemoteException { return taskID; }
+    public void setTaskID(long id) throws RemoteException { taskID = id; }
     
     public String getTaskType() throws RemoteException { return taskType; }
     protected void setTaskType(String t) { taskType = t; } 
+
     public String getTaskStatus() throws RemoteException{ return taskStatus; }
+    public void setTaskStatus(String st) throws RemoteException { taskStatus = st; }
+
+    public String getInput() throws RemoteException { return input; }
+    public void setInput(String in) throws RemoteException { input = in; }
+    public String getOutput() throws RemoteException { return output; }
+    public void setOutput(String out) throws RemoteException { output = out; }
+
     public short taskTTC() throws RemoteException { return taskTTC; }
     public byte getActiveAlgorithm() throws RemoteException { return algID; }
     public boolean setTaskSchedule(short refreshRate, StatusManager_Intf sm) throws RemoteException{
@@ -58,7 +71,8 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     
     /* Called by server to request update on Status Monitor statistics. */
     public void updateServer() throws RemoteException { 
-        statMan.updateTaskDetails(client, taskId, taskType, taskStatus, taskTTC);
+        // executePs(); // update resource stats
+        statMan.updateTaskDetails(client, taskID, taskType, taskStatus, input, output);
         statMan.updateResourceDetails(client, cpuUsage, memUsage, DRS, RSS, PMEM);
     }
 
@@ -81,7 +95,23 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
         return executePs();
     } 
 
-    private boolean executePs() {
+    protected void refreshDefaultValues() {
+        taskID = 12345;
+        taskType = "inactive";
+        taskStatus = "inactive";
+        input = "empty";
+        output = "empty";
+        taskTTC = 0;
+        
+        cpuUsage = 0;
+        memUsage = 0;
+        DRS = 0; // Data Resident Size.
+        RSS= 0; // Resident Set Size.
+        PMEM = 0; // % RAM used.
+        resourceRefreshRate = 0;
+    } 
+
+    private boolean executePs() { // Gets stats on process memory
         String line = "failure";
         String res[] = new String[11]; 
         String[] cmd = {"/bin/sh", "-c", "ps v | grep java"}; // need the first two strings (running from shell) so that the pipe can be used, doesn't work otherwise.

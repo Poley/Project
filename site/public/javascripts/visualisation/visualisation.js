@@ -47,7 +47,7 @@ d3.json("/javascripts/visualisation/tree.json", function (error, data) {
         } 
     } 
 
-    root.children.forEach(collapse);
+    //root.children.forEach(collapse);
     update(root);
 })
 
@@ -90,15 +90,15 @@ function update (source) {
         .style("fill-opacity", 1e-6);
     
     nodeEnter.append("text").attr("class", "stats")
-        .attr("id", "task")
+        .attr("id", "ID")
         .attr("x", 15)
         .attr("y", "1em")
-        .text( function (d) { return "Task: " + d.task ; });
+        .text( function (d) { return "Hostname: " + d.nodeID; });
     
     nodeEnter.append("text").attr("class", "stats")
         .attr("id", "input")
         .attr("x", 17) .attr("y", "2em")
-        .text( function (d) { return "Input: [.., .., .., ..]"; });
+        .text( function (d) { return "Input: " + d.input; });
     
     nodeEnter.append("text").attr("class", "stats")
         .attr("id", "memory")

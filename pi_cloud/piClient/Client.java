@@ -27,8 +27,8 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         localHost = h;
         serverAddress = sa;
         serverPort = p;
-        mergeS = new MergeSorter(null, null, h);
         sm = new StatusMonitor(localHost, this);
+        mergeS = new MergeSorter(null, null, h, sm);
         
         // Acquire server's dispatcher
         try {
@@ -91,8 +91,10 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         }
     }
 
-    public int[] executeMergeSort(int[] input) throws RemoteException {
-        return mergeS.sort( input);
+    public int[] executeMergeSort(long taskID, int[] input) throws RemoteException {
+        int[] result = mergeS.sort(taskID, input);
+        sm.refreshDefaultValues(); // Means the next execution won't contain old values
+        return mergeS.sort(taskID, input);
     }
 
     public void printDetails() {

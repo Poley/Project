@@ -13,6 +13,9 @@ public class Pi {
     private String taskStatus = "Inactive";
     private int ttc = 0;
 
+    private String input = "empty";
+    private String output = "empty";
+
     private short cpuUsage = 0;
     private int memUsage = 0;
     private int DRS = 0;
@@ -34,11 +37,12 @@ public class Pi {
         return true;
     }
 
-    protected boolean updateTaskDetails(long tId, String tt, String ts, int ttComplete) {
+    protected boolean updateTaskDetails(long tId, String tt, String ts, String in, String out) {
         taskId = tId;
         taskType = tt;
         taskStatus = ts;
-        ttc = ttComplete;
+        input = in;
+        output = out;
         return true;
     }
     

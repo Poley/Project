@@ -12,23 +12,40 @@ public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf
     private String hostname;
     private MergeSorter_Intf childA = null;
     private MergeSorter_Intf childB = null;
-    private short listThreshold = 5; // List size defining when the list should just be sorted locally rather than being distributed to children. 
+    private short listThreshold = 2; // List size defining when the list should just be sorted locally rather than being distributed to children. 
 
-    public MergeSorter( MergeSorter_Intf a, MergeSorter_Intf b, String h) throws RemoteException {
+    private StatusMonitor statMon = null;
+
+    public MergeSorter( MergeSorter_Intf a, MergeSorter_Intf b, String h, StatusMonitor sm) throws RemoteException {
         childA = a;
         childB = b;
         hostname = h;
+        statMon = sm;
     } 
 
-    public int[] sort(int[] list) throws RemoteException {
-        System.out.println("\nAsked to execute merge sort.\nList Size " + list.length + ". Has Children = " + hasChildren() + ".\n\nReceived List:"); 
+    public int[] sort(long taskID, int[] list) throws RemoteException {
+        //System.out.println("\nAsked to execute merge sort.\nList Size " + list.length + ". Has Children = " + hasChildren() + ".\n\nReceived List:"); 
+        System.out.print("\nReceived List: ");
         for (int i : list) { System.out.print(" " + i); } System.out.println();
+
+        try {
+            statMon.setTaskID( taskID);
+            statMon.setTaskType("Merge sort");
+            statMon.setInput( Arrays.toString(list) );
+            statMon.setTaskStatus("Recieved input");
+            statMon.updateServer();
+        } catch (Exception e) { e.printStackTrace(); } 
 
         int[] listA, listB, sortedListA, sortedListB;
         int[] sortedList = new int[list.length];
 
         if (list.length > listThreshold && hasChildren() ) { // if (list is larger than threshold && children are available), split to children.
-            System.out.println("\nDistributed to children.");
+            System.out.println("\nDistributing to children.");
+            try {
+                statMon.setTaskStatus("Waiting for children reply"); 
+                statMon.updateServer();
+            } catch (Exception e) { e.printStackTrace(); } 
+
             int mid = list.length/2;
             listA = new int[mid];
             listB = new int[list.length-mid];
@@ -39,23 +56,35 @@ public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf
 
             // Send each half of a list to each child
             if (childB == null) {
-                sortedListA = childA.sort(listA);
+                sortedListA = childA.sort(taskID, listA);
                 sortedListB = sortList(listB);
                 System.out.println("Merging local list + child list.");
             } else {
-                sortedListA = childA.sort(listA);
-                sortedListB = childB.sort(listB);
+                sortedListA = childA.sort(taskID, listA);
+                sortedListB = childB.sort(taskID, listB);
                 System.out.println("Merging sorted lists from children...");
             } 
             
             // merge results from both children
+            try{
+                statMon.setTaskStatus("Merging"); 
+                statMon.updateServer();
+            } catch (Exception e) { e.printStackTrace(); } 
             sortedList = merge(sortedListA, sortedListB); 
         } else {
-            System.out.println("\nNo children available, sorting locally.");
+            try{
+                statMon.setTaskStatus("Sorting & merging locally"); 
+                statMon.updateServer();
+            } catch (Exception e) { e.printStackTrace(); } 
             sortedList = sortList( list);
         } 
         
-        System.out.println("\nSorted List"); for (int i : sortedList) System.out.print(" " + i); System.out.println();
+        System.out.print("\nSorted List: "); for (int i : sortedList) System.out.print(" " + i); System.out.println();
+        try {
+            statMon.setTaskStatus("Done."); // "Idle" be better?
+            statMon.setOutput( Arrays.toString(sortedList) );
+            statMon.updateServer();
+        } catch (Exception e) { e.printStackTrace(); } 
         return sortedList;
     } 
 

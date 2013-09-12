@@ -118,16 +118,47 @@ public class Controller {
     } 
 
     protected int[] executeAlgorithm(int[] mergeSortInput) {
-        System.out.println("\nInput:") ;
-        for (int i : mergeSortInput) System.out.print(" " + i);
+        dispatch.defineClusterNetwork( cluster.getClients() , mergeSortInput.length ); // define each nodes children.
 
-        dispatch.defineClusterNetwork( cluster.getClients() ); // define each nodes children.
-        int[] result = dispatch.executeMergeSort(cluster.getClients(), mergeSortInput); 
+        // Create Task in database
+        long taskID = System.currentTimeMillis();
+        String taskCreateStr = "INSERT INTO Task (task_id, type) VALUES ('" + taskID + "', 'MergeSort');";
+        try {
+            PreparedStatement createTaskStmt = dbConnection.prepareStatement(taskCreateStr);
+            createTaskStmt.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
 
-        System.out.println("\nSorted List: ");
-        for (int j : result) System.out.print(" " + j);
+        int[] result = dispatch.executeMergeSort(taskID, cluster.getClients(), mergeSortInput); 
 
         return result;
+    } 
+
+    public String getMostRecentTaskEvents() {
+        String eventQry = "SELECT * FROM Event e " +
+                             "INNER JOIN ( SELECT max(task_id) ti FROM Task GROUP BY task_id) m " + // Gets task_id of most recently executed task
+                             "ON e.task_id = m.ti";
+        String eventsMessage = "eventData|2";
+        try {
+            PreparedStatement eventStmt = dbConnection.prepareStatement(eventQry);
+            ResultSet eventRs = eventStmt.executeQuery();
+
+            while (eventRs.next()) {
+                eventsMessage += "|" + eventRs.getDouble("task_id") + "|";
+                eventsMessage += eventRs.getString("status") + "|";
+                eventsMessage += eventRs.getString("input") + "|";
+                eventsMessage += eventRs.getString("output") + "|";
+                eventsMessage += eventRs.getLong("timestamp") + "|";
+                eventsMessage += eventRs.getString("ip") + "|";
+                eventsMessage += eventRs.getShort("percentageMemory");
+            } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Controller.java: Error executing query to retrieve most recent task events.");
+            System.exit(1);
+        } 
+
+
+        return eventsMessage;
     } 
 
     public static void main(String args[]) {
@@ -156,7 +187,7 @@ public class Controller {
             System.out.println("_________"); 
 
             switch(input) { 
-                case 6: String eventStmtText = "SELECT * FROM Event";
+            /*    case 6: String eventStmtText = "SELECT * FROM Event";
                         try {
                             PreparedStatement eventPStmt = dbConnection.prepareStatement(eventStmtText);
                             ResultSet eventRs = eventPStmt.executeQuery();
@@ -180,23 +211,23 @@ public class Controller {
                         } 
 
 
-                case 5: dispatch.defineClusterNetwork( cluster.getClients() ); // define each nodes children.
-                        int[] msInput = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783,2,61,562,37,48,9,0,49,4};
+                case 5: int[] msInput = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783,2,61,562,37,48,9,0,49,4};
+                        dispatch.defineClusterNetwork( cluster.getClients(), msInput.length  ); // define each nodes children.
                         System.out.println("Default list of integers will be used.");
                         
                         Client_Intf clients[] = cluster.getClients();
                         try {
                             for (int i = 0; i < clients.length; i++) {
                                 if ( !clients[i].getMS().hasChildren() ) { 
-                                    int[] result = dispatch.executeMergeSort(cluster.getClients(), msInput);
+                                    int[] result = dispatch.executeMergeSort(taskId, cluster.getClients(), msInput);
                                     break;
                                 }
                             } 
                         } catch (RemoteException e ) { e.printStackTrace(); }
                         
                         break;
-                case 4: dispatch.defineClusterNetwork( cluster.getClients() ); // define each nodes children.
-                        int[] mergeSortInput = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783,2,61,562,37,48,9,0,49,4};
+                case 4: int[] mergeSortInput = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783,2,61,562,37,48,9,0,49,4};
+                        dispatch.defineClusterNetwork( cluster.getClients(), mergeSortInput.length ); // define each nodes children.
                         System.out.println("Default list of integers will be used.");
 
                         System.out.println("\nInput:") ;
@@ -219,6 +250,7 @@ public class Controller {
                         if (cluster.size() > 0) cluster.printClusterTasks();
                         else System.out.println("Cluster is empty.");
                         break;
+                        */
                 case 0: System.out.println("Exiting...");
                         try {
                             //outputRoute.close();

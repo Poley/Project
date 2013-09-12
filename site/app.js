@@ -4,6 +4,7 @@ var express = require('express');
 var index = require('./routes/index');
 var http = require('http');
 var path = require('path');
+var fs = require('fs');
 
 var app = express();
 
@@ -30,6 +31,7 @@ if ('development' == app.get('env')) {
 // Global list manipulated by web app.
 globalList = [1,2,3];
 resultList = [0];
+visReady = false; // used to indicate when the visualisation has all information it requires e.g. result & event data.
 
 // Establishing connection to back-end Pi Manager.
 webSocket = require('faye-websocket');
@@ -48,6 +50,20 @@ ws.on('message', function(event) {
                     // skip checking single / distributed
                     var tte = splitMessage[3]
                     resultList = splitMessage[4];
+                    ws.send("eventData|1"); // Requests the Pi Server sends information on events during the merge sort execution
+                } 
+            } else if (splitMessage[0]=="getClusterNetwork" && splitMessage[1]=="2"){
+                console.log("Writing cluster tree json");
+                var treeJsonText = splitMessage[2];
+                fs.writeFileSync("./public/javascripts/visualisation/tree.json", splitMessage[2]);
+                /*function(err) {
+                                                                                               if(err){ console.log(err); }
+                                                                                               else {console.log("File written.");}
+                                                                                               }); */
+            } else if (splitMessage[0]=="eventData" && splitMessage[1]=="2") {
+                console.log("EventData:");
+                for (i=3; i < splitMessage.length; i++){
+                    console.log(splitMessage[i]);
                 } 
             } 
         });

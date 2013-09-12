@@ -69,27 +69,29 @@ public class Cluster {
     }
 
     // Called when a client wishes to update the server's stored task details on itself.
-    protected boolean updateTaskDetails(Client_Intf n, long taskId, String taskType, String taskStatus, int ttc) {
+    protected boolean updateTaskDetails(Client_Intf n, long taskId, String taskType, String taskStatus, String input, String output) {
         // update Pi instance's details
         Pi node = piCluster.get(n);
-        node.updateTaskDetails(taskId, taskType, taskStatus, ttc);
+        node.updateTaskDetails(taskId, taskType, taskStatus, input, output); // correct this!!!
         piCluster.put(n, node); // is this needed?
 
         // Write task update to database (task_id, status, detail (list status), timestamp, ip, pMem)
         try {
-            PreparedStatement addEvent = dbConnection.prepareStatement("INSERT INTO Event VALUES (?, ?, ?, ?, ?, ?)");
+            PreparedStatement addEvent = dbConnection.prepareStatement("INSERT INTO Event VALUES (?, ?, ?, ?, ?, ?, ?)");
             addEvent.setLong(1, node.getTaskId());
             addEvent.setString(2, node.getTaskStatus() );
-            addEvent.setString(3, ""); // list status
-            addEvent.setLong(4, 1); // give timestamp
-            addEvent.setString(5, node.getHost() ); // ip
-            addEvent.setLong(6, node.getPMem() ); 
+            addEvent.setString(3, input); // node input
+            addEvent.setString(4, output); // node output
+            addEvent.setLong(5, System.currentTimeMillis()); // give timestamp
+            addEvent.setString(6, node.getHost() ); // ip
+            addEvent.setLong(7, node.getPMem() );  // process memory
 
             int res = addEvent.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("FAILURE: Cluster.java: Error writing to database.");
+            System.exit(1);
         } 
 
         return true;

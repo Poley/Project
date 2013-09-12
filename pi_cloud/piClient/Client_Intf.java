@@ -4,7 +4,7 @@ import java.rmi.*;
 
 public interface Client_Intf extends Remote {
     
-    public int[] executeMergeSort(int[] input) throws RemoteException;
+    public int[] executeMergeSort(long taskID, int[] input) throws RemoteException;
     
     public StatusMonitor_Intf getStatusMonitor() throws RemoteException;
     public String getHostname() throws RemoteException;

@@ -34,8 +34,8 @@ public class initClient {
         } catch (Exception e) { } 
         
         try {
-            client = new Client(host, serverAddress, serverPort);
-            client.interact();
+            client = new Client( "" + System.currentTimeMillis(), serverAddress, serverPort);
+         //   client.interact();
         } catch (RemoteException e) {
             e.printStackTrace();
         }

@@ -4,7 +4,7 @@ import java.rmi.*;
 
 public interface MergeSorter_Intf extends Remote {
 
-    public int[] sort(int[] list) throws RemoteException;
+    public int[] sort(long taskID, int[] list) throws RemoteException;
 
     public void setListThreshold(short t) throws RemoteException;
     public void setChildren(MergeSorter_Intf ma, MergeSorter_Intf mb) throws RemoteException;

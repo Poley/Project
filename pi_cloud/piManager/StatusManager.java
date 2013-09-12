@@ -15,14 +15,14 @@ public class StatusManager extends UnicastRemoteObject implements StatusManager_
 
     public boolean updateResourceDetails(Client_Intf node, short cpuUsage, int memUsage, int DRS, int RSS, short PMEM) throws RemoteException {
         if (!cluster.updateResourceDetails(node, cpuUsage, memUsage, DRS, RSS, PMEM)) { 
-            System.out.println("error updatin resources");
+            System.out.println("StatusManager.java: Error updating resources");
             return false;
         }
         else return true;
     }
 
-    public boolean updateTaskDetails(Client_Intf node, long taskId, String taskType, String taskStatus, short ttc) throws RemoteException {
-        if (!cluster.updateTaskDetails(node, taskId, taskType, taskStatus, ttc) ) return false;
+    public boolean updateTaskDetails(Client_Intf node, long taskId, String taskType, String taskStatus, String input, String output) throws RemoteException {
+        if (!cluster.updateTaskDetails(node, taskId, taskType, taskStatus, input, output) ) return false;
         else return true;
     }
 
