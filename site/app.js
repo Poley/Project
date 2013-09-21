@@ -5,8 +5,10 @@ var index = require('./routes/index');
 var http = require('http');
 var path = require('path');
 var fs = require('fs');
+var util = require('util');
 
 var app = express();
+
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -31,6 +33,9 @@ if ('development' == app.get('env')) {
 // Global list manipulated by web app.
 globalList = [1,2,3];
 resultList = [0];
+eventDictionary = {}; // dictionary containing all events occured during an algorithm. Key:value = timestamp:eventObj .
+eventString = "";
+eventsOrdered = []; // ordered list of events occuring within one task execution, used for web app to iterate across events in order.
 visReady = false; // used to indicate when the visualisation has all information it requires e.g. result & event data.
 
 // Establishing connection to back-end Pi Manager.
@@ -42,8 +47,9 @@ ws.on('open', function(event){
         });
 
 ws.on('message', function(event) {
-            console.log('Message Recieved: ', event.data);
             splitMessage = event.data.split("|");
+            console.log('Message Recieved: ' + splitMessage[0] + "," + splitMessage[1] );
+
 
             if (splitMessage[0]=="mergesort") { // "mergesort|optcode|distributed/single|tte|resultList"
                 if (splitMessage[1]=="2") { // merge sort response
@@ -56,15 +62,19 @@ ws.on('message', function(event) {
                 console.log("Writing cluster tree json");
                 var treeJsonText = splitMessage[2];
                 fs.writeFileSync("./public/javascripts/visualisation/tree.json", splitMessage[2]);
-                /*function(err) {
-                                                                                               if(err){ console.log(err); }
-                                                                                               else {console.log("File written.");}
-                                                                                               }); */
             } else if (splitMessage[0]=="eventData" && splitMessage[1]=="2") {
-                console.log("EventData:");
-                for (i=3; i < splitMessage.length; i++){
-                    console.log(splitMessage[i]);
+                /*
+                for (i=2; i<splitMessage.length; i=i+7) { // structure per event: taskid|status|input|output|timestamp|ip|pmem
+                    eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], 
+                                                    splitMessage[i+4], splitMessage[i+5], splitMessage[i+6]);
+                }
+                */
+                for (i=2; i<splitMessage.length; i++) {
+                    eventString += splitMessage[i] + "|";
                 } 
+                console.log( "\n" + eventString);
+                //console.log("Event data received and dictionary created.");
+                //console.log( eventDictionary);
             } 
         });
 
@@ -78,17 +88,24 @@ ws.on('close', function(event) {
 app.get('/', index.home);
 app.get('/merge_sort', index.mergeSort_Home);
 
-app.get('/merge_sort/config', index.mergeSort_Configuration);
-app.post('/merge_sort/config', index.mergeSort_Configuration_postHandler);
-
 app.get('/merge_sort/input', index.mergeSort_Input);
 app.post('/merge_sort/input', index.mergeSort_Input_postHandler);
 
 app.get('/merge_sort/visualisation', index.mergeSort_Visualisation);
-app.get('/merge_sort/graphs', index.mergeSort_Graphs);
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
     });
 
 
+function eventObj(taskid, taskStatus, inp,out, timestamp, ipAddr, pm) {
+    eventO = {};
+    eventO.task_id = taskid;
+    eventO.tStatus = taskStatus;
+    eventO.input = inp;
+    eventO.output = out;
+    eventO.tStamp = timestamp;
+    eventO.ip = ipAddr;
+    eventO.pmem = pm;
+    return eventO;
+} 

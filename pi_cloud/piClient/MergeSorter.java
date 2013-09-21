@@ -16,18 +16,31 @@ public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf
 
     private StatusMonitor statMon = null;
 
+    private short resultsReceived; // Keeps track of how many children have responded
+    private int[] cachedResult = new int[0]; // When two children are given a part of a list, the first result to respond is cached so as to be used later when the 2nd child responds.
+    private MergeSorter_Intf parent;
+    private Client client; // The client is only known by the root node, otherwise remains null.
+    private boolean isRoot = false;
+
     public MergeSorter( MergeSorter_Intf a, MergeSorter_Intf b, String h, StatusMonitor sm) throws RemoteException {
         childA = a;
         childB = b;
         hostname = h;
         statMon = sm;
     } 
-
-    public int[] sort(long taskID, int[] list) throws RemoteException {
-        //System.out.println("\nAsked to execute merge sort.\nList Size " + list.length + ". Has Children = " + hasChildren() + ".\n\nReceived List:"); 
+    
+    public void sort(Client cli, MergeSorter_Intf parentNode, long taskID, int[] list, boolean isR) throws RemoteException {
+       // refreshDefaultValues();
+        parent = parentNode;
+        isRoot = isR;
+        if (isRoot) client = cli;
+        
+        statMon.refreshDefaultValues(); // Means the next execution won't contain old values
+        
         System.out.print("\nReceived List: ");
         for (int i : list) { System.out.print(" " + i); } System.out.println();
 
+        System.out.println("Children:" + childA + ", " + childB);
         try {
             statMon.setTaskID( taskID);
             statMon.setTaskType("Merge sort");
@@ -55,37 +68,25 @@ public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf
             System.arraycopy(list, mid, listB, 0, (list.length-mid));
 
             // Send each half of a list to each child
+            // NOTE: It is here where the issue for the synchronous execution lies.
             if (childB == null) {
-                sortedListA = childA.sort(taskID, listA);
-                sortedListB = sortList(listB);
-                System.out.println("Merging local list + child list.");
+                cachedResult = sortList(listB);
+                resultsReceived++; // indicates that the client will wait for only one callback before it replies to it's parent. 
             } else {
-                sortedListA = childA.sort(taskID, listA);
-                sortedListB = childB.sort(taskID, listB);
-                System.out.println("Merging sorted lists from children...");
+                childA.sort(null, this, taskID, listA, false);
+                childB.sort(null, this, taskID, listB, false);
             } 
-            
-            // merge results from both children
-            try{
-                statMon.setTaskStatus("Merging"); 
-                statMon.updateServer();
-            } catch (Exception e) { e.printStackTrace(); } 
-            sortedList = merge(sortedListA, sortedListB); 
         } else {
-            try{
-                statMon.setTaskStatus("Sorting & merging locally"); 
+            try {
+                statMon.setTaskStatus("Sorting locally"); 
+                System.out.println("Sorting locally");
                 statMon.updateServer();
             } catch (Exception e) { e.printStackTrace(); } 
             sortedList = sortList( list);
+            resultsReceived++;
+            sortingCallback( sortedList);
         } 
         
-        System.out.print("\nSorted List: "); for (int i : sortedList) System.out.print(" " + i); System.out.println();
-        try {
-            statMon.setTaskStatus("Done."); // "Idle" be better?
-            statMon.setOutput( Arrays.toString(sortedList) );
-            statMon.updateServer();
-        } catch (Exception e) { e.printStackTrace(); } 
-        return sortedList;
     } 
 
     private int[] sortList(int[] list) {
@@ -133,7 +134,7 @@ public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf
             childrenString = new String[2];
             childrenString[0] = childA.getHostname();
             childrenString[1] = childB.getHostname();
-        } else if (childA != null ^ childB != null) {
+        } else if (childA != null | childB != null) {
             childrenString = new String[1];
             if (childA != null) childrenString[0] = childA.getHostname();
             else childrenString[0] = childB.getHostname();
@@ -141,11 +142,51 @@ public class MergeSorter extends UnicastRemoteObject implements MergeSorter_Intf
         return childrenString;
     } 
 
+    // When a child has sorted it's list, it calls this method to reply to it's parent with the answer.
+    public synchronized void sortingCallback(int[] result) throws RemoteException {
+        resultsReceived++;
+        if (resultsReceived == 2) {
+            try {
+                statMon.setTaskStatus("Merging"); 
+                statMon.updateServer();
+            } catch (Exception e) { e.printStackTrace(); } 
+            int[] sortedList = merge( result, cachedResult); 
+            
+            System.out.print("\nSorted List: "); for (int i : sortedList) System.out.print(" " + i); System.out.println();
+            try {
+                statMon.setTaskStatus("Done."); // "Idle" be better?
+                statMon.setOutput( Arrays.toString(sortedList) );
+                statMon.updateServer();
+            } catch (Exception e) { e.printStackTrace(); } 
+            // reply to parent
+            
+            if (!isRoot) parent.sortingCallback( sortedList);
+            else client.taskFinished(sortedList);
+            resultsReceived = 0;
+        } else {
+            cachedResult = result;
+        } 
+    } 
+
+    private void refreshDefaultValues() {
+        childA = null;
+        childB = null;
+        resultsReceived = 0;
+        cachedResult = new int[0];
+        parent = null;
+        client = null;
+        isRoot = false;
+    } 
+
     // getters & setters
     public String getHostname() throws RemoteException { return hostname; }
     public void setListThreshold(short t) throws RemoteException { listThreshold = t; }
     
-    public void setChildren(MergeSorter_Intf ma, MergeSorter_Intf mb) throws RemoteException { childA = ma; childB = mb; } 
+    public void setChildren(MergeSorter_Intf ma, MergeSorter_Intf mb) throws RemoteException { 
+        System.out.println("I've been given children!");
+        childA = ma;
+        childB = mb; 
+    } 
     public boolean hasChildren() throws RemoteException { return !(childA == null && childB == null); } 
 
 }

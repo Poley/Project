@@ -11,9 +11,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
+/* Object representing and containig all details on the Cluster of registered clients.
+   Contains functions for adding/deleting clients, and updating details upon them.
+ */
 public class Cluster {
     
-    //private ArrayList<Pi> piCluster;
     private HashMap<Client_Intf, Pi> piCluster;
     private StatusManager statMan;
     private Connection dbConnection;
@@ -30,7 +32,6 @@ public class Cluster {
             System.out.println("FAILURE: Cluster.java: Error creating Status Manager."); 
             e.printStackTrace();
         }
-        
     }
 
     // NOTE: Whenever a new client is added, all clients in cluster have their details updated. This is likely unnecessary.
@@ -46,8 +47,6 @@ public class Cluster {
             e.printStackTrace(); 
             return false; 
         }
-        
-        //requestTaskDetailUpdate();
         return true;
     } 
     
@@ -61,6 +60,7 @@ public class Cluster {
         }
     }
 
+    // Updates the resource details of a specified Client.
     protected boolean updateResourceDetails(Client_Intf n, short cpuUsage, int memUsage, int DRS, int RSS, short PMEM) {
         Pi node = piCluster.get(n); // might be worth validating it exists
         node.updateResourceDetails(cpuUsage, memUsage, DRS, RSS, PMEM);
@@ -68,14 +68,15 @@ public class Cluster {
         return true;
     }
 
-    // Called when a client wishes to update the server's stored task details on itself.
+    // Updates the task details of a specified Client.
     protected boolean updateTaskDetails(Client_Intf n, long taskId, String taskType, String taskStatus, String input, String output) {
         // update Pi instance's details
         Pi node = piCluster.get(n);
-        node.updateTaskDetails(taskId, taskType, taskStatus, input, output); // correct this!!!
-        piCluster.put(n, node); // is this needed?
+        node.updateTaskDetails(taskId, taskType, taskStatus, input, output); 
+        piCluster.put(n, node);
 
-        // Write task update to database (task_id, status, detail (list status), timestamp, ip, pMem)
+        // Write task update to database (task_id, status, input, output, timestamp, ip, pMem)
+        // Adds a new 'Event' to the database.
         try {
             PreparedStatement addEvent = dbConnection.prepareStatement("INSERT INTO Event VALUES (?, ?, ?, ?, ?, ?, ?)");
             addEvent.setLong(1, node.getTaskId());
@@ -97,46 +98,14 @@ public class Cluster {
         return true;
     }
     
+    // Getters
+    
     // Triggers Status Manager to request all clients to update their task details and reply with the update.
     protected void requestUpdate() {
         statMan.requestUpdate( getStatusMonitors());
     }
     
-    protected void printClusterTasks() {
-        System.out.println("Host Name \t\tTask");
-
-        Pi pis[] = piCluster.values().toArray( new Pi[piCluster.size()] ); 
-        for (int i = 0; i < pis.length; i++) {
-            System.out.println(pis[i].getHost() + "\t\t" + pis[i].getTaskType() );
-        } 
-
-        System.out.println("All tasks retrieved.");
-    } 
-    
-    protected void printResourceStats() {
-        Pi pis[] = piCluster.values().toArray( new Pi[piCluster.size()] ); 
-        for (int i = 0; i < pis.length; i++) {
-            System.out.println("HostName: " + pis[i].getHost() ); 
-            pis[i].printResourceStats();
-        }
-
-        System.out.println("All tasks retrieved.");
-    } 
-    
-    /* Getters & Setters */
-    protected HashMap<Client_Intf, Pi> getFullDetails() {
-        return piCluster;
-    }
-
-    protected String[] getClientHosts() {
-        String[] hosts = new String[ piCluster.size()];
-        Client_Intf clients[] = (Client_Intf[]) piCluster.keySet().toArray();
-        for (int i = 0; i < hosts.length; i++) {
-            hosts[i] = piCluster.get( clients[i]).getHost();
-        }
-        return hosts;
-    } 
-
+    // Returns the a list of all StatusMonitors beloning to each registered client
     protected StatusMonitor_Intf[] getStatusMonitors() {
         StatusMonitor_Intf statMons[] = new StatusMonitor_Intf[ piCluster.size()];
         Client_Intf clients[] = piCluster.keySet().toArray( new Client_Intf[piCluster.size()] );
@@ -153,6 +122,4 @@ public class Cluster {
     protected int size() {
         return piCluster.size();
     }
-
-   
 }

@@ -12,10 +12,14 @@ import org.java_websocket.server.*;
 
 import com.google.gson.Gson;
 
+/* This class represents a socket, and handles all socket communciation between Web Server and Pi Manager.
+   It makes used of the java_websocket package, details of which can be found at: http://java-websocket.org/ 
+ */
 public class PiServerSocket extends WebSocketServer {
 
-    ArrayList<WebSocket> connections = new ArrayList<WebSocket>();
-    Controller controller = null;
+    private ArrayList<WebSocket> connections = new ArrayList<WebSocket>(); // Contains a list of open connections
+    private Controller controller = null; 
+    private WebSocket connection;
 
     public PiServerSocket( int port) throws UnknownHostException {
         super( new InetSocketAddress( port) );
@@ -28,22 +32,27 @@ public class PiServerSocket extends WebSocketServer {
         controller = c;
     } 
     
+    // Called when a connection is newly established
     public void onOpen( WebSocket conn, ClientHandshake handshake) {
         System.out.println( "Connection to " + conn.getRemoteSocketAddress().getAddress().getHostAddress() + " has been made.");
         connections.add(conn);
     } 
 
+    // Called when a socket connection closes
     public void onClose( WebSocket conn, int code, String reason, boolean remote) {
         System.out.println("Connection to " + conn.getRemoteSocketAddress().getAddress().getHostAddress() + " has closed: " + reason);
     } 
 
+    // Called when a message is received from the socket
     public void onMessage( WebSocket conn, String message) {
         System.out.println("Recieved message: " + message);
         String[] splitlist = message.split("\\|");
 
+        connection = conn;
+
         if (splitlist[0].contains("mergesort") ) {
             if (splitlist[1].equals("1") ){
-                // skip checkin if distributed or not, assume it is for now.
+                // skipped checking if distributed or not, assume it is for now.
                 String[] inputList = splitlist[3].split(",");
 
                 int[] intlist = new int[inputList.length];
@@ -52,33 +61,21 @@ public class PiServerSocket extends WebSocketServer {
                 } 
                 System.out.print("\n");
 
-                int[] result = controller.executeAlgorithm(intlist);
-                String resultString = "" + result[0];
-                for (int j=1; j<result.length; j++) { resultString += "," + result[j]; } 
-                conn.send("mergesort|2|2|0|" + resultString.toString());
-                System.out.println("Sent Message: " + "mergesort|2|2|0|" + resultString.toString());
+                controller.executeAlgorithm(intlist);
             } 
         } else if (splitlist[0].contains("getClusterNetwork") ) { // Request received to return with a definition of the network / tree
-            HashMap<String, String[]> testNetwork = new HashMap<String, String[]>();
-            //testNetwork.put("nodeA", new String[]{"nodeB", "nodeC"});
-            //testNetwork.put("nodeB", new String[]{"nodeD", "nodeE"});
-            //testNetwork.put("nodeC", new String[]{"nodeF"});
-            //testNetwork.put("nodeD", new String[]{});
-            //testNetwork.put("nodeE", new String[]{});
-            //testNetwork.put("nodeF", new String[]{});
-            
-            String jsonFile = writeTreeJson( controller.getClusterNetwork() );
-            String[] keySet = controller.getClusterNetwork().keySet().toArray(new String[testNetwork.size()] );
+            HashMap<String, String[]> network = controller.getClusterNetwork();
+            String jsonFile = writeTreeJson( network);
+            String[] keySet = network.keySet().toArray(new String[network.size()] );
             for( int i=0; i < keySet.length; i++) {
-                System.out.println( keySet[i] + ":");
+                System.out.print("\n" + keySet[i] + ":");
                 String[] children = controller.getClusterNetwork().get(keySet[i]) ;
                 for (int j=0; j < children.length; j++) {
-                    System.out.println( children[j]);
+                    System.out.print( children[j] + ", ");
                 } 
             } 
+            System.out.println();
             
-            ///String jsonFile = writeTreeJson( testNetwork );
-
             String networkMessage = "getClusterNetwork|2|" + jsonFile;
             
             System.out.println("Send Message: "+ networkMessage);
@@ -90,8 +87,17 @@ public class PiServerSocket extends WebSocketServer {
 
     } 
 
+    // Called when there is an error across the socket channel.
     public void onError( WebSocket conn, Exception ex) {
         ex.printStackTrace();
+    } 
+
+    // Sends the result from a merge sort execution. This is done rather stupidly for the moment, sending the result to it's most recently established connection.
+    protected void sendMergeSortResult(int[] result) {
+        String resultString = "" + result[0];
+        for (int j=1; j<result.length; j++) { resultString += "," + result[j]; } 
+        connection.send("mergesort|2|2|0|" + resultString.toString());
+        System.out.println("Sent Message: " + "mergesort|2|2|0|" + resultString.toString());
     } 
 
     
@@ -102,6 +108,7 @@ public class PiServerSocket extends WebSocketServer {
         } 
     } 
 
+    // This method write a String object, of which defines the network in the format of a JSON file. When the web-server recieves this String, it writes it to a json file.
     private String writeTreeJson(HashMap<String, String[]> network ) {
         HashMap<String, JsonNode> nodes = new HashMap<String, JsonNode>();
         
@@ -135,13 +142,14 @@ public class PiServerSocket extends WebSocketServer {
         JsonNode root = null;
         for (int i=0; i < nodes.size(); i++) {
             if ( !nodes.get(nodeKeySet[i]).hasParent() ){
-                System.out.println("Root found!");
+                System.out.print("\nRoot found!");
                 root = nodes.get( nodeKeySet[i]);
+                System.out.print( nodeKeySet[i] + "\n");
                 break;
             } 
         } 
 
-        Gson gson = new Gson();
+        Gson gson = new Gson(); // This package converts java objects to JSON files.
         String jsonMessage = gson.toJson(root);
         return jsonMessage; 
     } 

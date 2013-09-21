@@ -8,7 +8,12 @@ import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.BufferedReader;
 
-
+/* Handles communciation with the Pi Manager regarding task or resource details.
+    Though no implemented, some variables are available so as to allow for periodic update
+     to the Pi Manager (refresh rates), rather than manual update as it currently is.
+    Methods that acquire resource statistics should be implemented here
+    , see executePs() for example.
+ */
 public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_Intf, Serializable {
 
     private StatusManager_Intf statMan;
@@ -20,7 +25,6 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     private String input = "empty";
     private String output = "empty";
     private short taskTTC = 0;
-    private byte algID; // ID identifying which algorithm is being executed
     
     private short taskRefreshRate = 0; // 0 means no refresh, all updates are executed manually.
 
@@ -55,7 +59,6 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     public void setOutput(String out) throws RemoteException { output = out; }
 
     public short taskTTC() throws RemoteException { return taskTTC; }
-    public byte getActiveAlgorithm() throws RemoteException { return algID; }
     public boolean setTaskSchedule(short refreshRate, StatusManager_Intf sm) throws RemoteException{
         taskRefreshRate = refreshRate;
         return true;
@@ -95,6 +98,10 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
         return executePs();
     } 
 
+    /* Because a status monitor could be used for multiple different task executions, it is 
+        important to refresh the default values of it before another task begins.
+        Otherwise, the new task execution will contain some old and incorrect values.
+     */
     protected void refreshDefaultValues() {
         taskID = 12345;
         taskType = "inactive";
@@ -110,7 +117,10 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
         PMEM = 0; // % RAM used.
         resourceRefreshRate = 0;
     } 
-
+    
+    /* Gets statitics on the amount of memory the process uses
+        It executes the ps command to command line, and then parses it's output.
+     */
     private boolean executePs() { // Gets stats on process memory
         String line = "failure";
         String res[] = new String[11]; 

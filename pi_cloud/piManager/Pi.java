@@ -2,9 +2,11 @@ package pi_cloud.piManager;
 
 import pi_cloud.piClient.*;
 
+/* Class contains the most recently updated task and resource statistics upon a Pi in the cluster.
+   Also contains other, more static details such as hostname and the remote objet for it's statMon.
+ */
 public class Pi {
 
-    //private Client_Intf node;
     private StatusMonitor_Intf statMon;
     private String host;
 
@@ -18,8 +20,8 @@ public class Pi {
 
     private short cpuUsage = 0;
     private int memUsage = 0;
-    private int DRS = 0;
-    private int RSS = 0;
+    private int DRS = 0; // DRS memory
+    private int RSS = 0; // RSS memory
     private short PMEM = 0; // process memory
 
 

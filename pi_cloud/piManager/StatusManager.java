@@ -53,7 +53,6 @@ public class StatusManager extends UnicastRemoteObject implements StatusManager_
                 e.printStackTrace();
             } 
         } 
-        //System.out.println("All tasks retrieved.");
     } 
 
     protected void setClientsStatusManager(StatusMonitor_Intf sm) {

@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 
+/* This class handles the cluster of clients, handling functions such as registration,
+    defining and acquiring the network stucture of the cluster. This object is used as a remote object client-side.
+ */
 public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
-
-    Controller c;
-    ArrayList<String> ipAddresses = new ArrayList<String>();
-
-    MergeSorter_Intf master = null;
+    private Controller c;
+    private ArrayList<String> ipAddresses = new ArrayList<String>();
 
     public Dispatcher(Controller contr) throws RemoteException {
         super(); 
@@ -32,35 +32,36 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
         return c.removeClient(node);
     }
 
-    // Returns time-to-execute
-    protected int[] executeMergeSort(long taskID, Client_Intf[] clients, int[] input) {
+    protected void executeMergeSort(long taskID, Client_Intf[] clients, int[] input) {
         int[] sorted = new int[input.length];
 
         try {
             if (clients.length > 0) {
-                long startTime = System.nanoTime();
-                sorted = clients[0].getMS().sort(taskID, input);
-                long endTime = System.nanoTime();
-                long tte = endTime - startTime;
+                clients[0].executeMergeSort(taskID, input); // The first client in the list is always treated as the root.
             }
         } catch (Exception e) {
             e.printStackTrace();
         } 
-        return sorted;
-    }
+   }
+
+    public void mergeSortResult(int[] result) throws RemoteException {
+        c.mergeSortResult(result);    
+    } 
 
     // Define children within the network, used pre-execution of certain algorithms.
     protected void defineClusterNetwork(Client_Intf[] clients, int listLength) {
         System.out.println("Clients available = " + clients.length);
-
-        for (int i = 0; i < clients.length; i++) {
+        int i; // iterates across all nodes, and allocates them children if any are available.
+        int j; // marks the next node to be allocated as a child.
+        System.out.println( clients);
+        for (i = 0, j=1; j < clients.length; i++) {
            try {
-               if ( ((clients.length) - i) > 2) { // two children avilable to be assigned
-                    clients[i].getMS().setChildren( clients[i+1].getMS(), clients[i+2].getMS() );
-                    i=i+2;
-                } else if ( ((clients.length)-i) == 2 ) { // only one child available to be assigned
-                    clients[i].getMS().setChildren( clients[i+1].getMS(), null);
-                    i++;
+               if ( ((clients.length) - j) > 1) { // two children avilable to be assigned
+                    clients[i].getMS().setChildren( clients[j].getMS(), clients[j+1].getMS() );
+                    j+=2;
+                } else if ( ((clients.length)-j) == 1 ) { // only one child available to be assigned
+                    clients[i].getMS().setChildren( clients[j].getMS(), null);
+                    j++;
                 } 
             } catch (RemoteException e) {
                 e.printStackTrace();

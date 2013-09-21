@@ -22,6 +22,10 @@ import java.io.*; // may not need this
 import org.java_websocket.server.*;
 import org.java_websocket.server.DefaultWebSocketServerFactory;
 
+/* This class co-ordinates communcation between the web server and all clients.
+   It sets up the database, RMI objects and web socket communcation. 
+   Run this class to start the Pi Manager.
+ */
 public class Controller {
     
     private Cluster cluster;
@@ -32,8 +36,6 @@ public class Controller {
     private short port = 1099;
 
     private PiServerSocket server = null;
-    private PrintWriter outputRoute = null;
-    private BufferedReader inputRoute = null;
 
     public Controller() {
         // Finding local IP address
@@ -69,19 +71,6 @@ public class Controller {
             System.exit(1);
         } 
         
-        // Set up server socket for front-end to communicate with
-        /*
-        short socketPort = 4444;
-        try {
-            serverSocket = new ServerSocket(socketPort);
-            System.out.println("Success: Server socket created.");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("FAILURE: Server Socket can't listen on port " + socketPort); 
-            System.exit(1);
-        } 
-        */
-        
         // Setting up RMI
         try {
             Registry reg = LocateRegistry.createRegistry( port);
@@ -103,21 +92,27 @@ public class Controller {
 
         connectAndListenToPort();
     }
+    
+    public static void main(String args[]) {
+        Controller c = new Controller();
+        c.interact();
+    }
 
+    // Sets up the socket which the web server can then connect to.
     public void connectAndListenToPort() {
         try {
             server = new PiServerSocket( new InetSocketAddress("localhost", 4444), this );
             System.out.println( server.getAddress() );
             
             server.setWebSocketFactory( new DefaultWebSocketServerFactory() );
-            
             server.start();
         } catch (Exception e) { 
             e.printStackTrace();
         }
     } 
 
-    protected int[] executeAlgorithm(int[] mergeSortInput) {
+    // Initiates the execution of a merge sort algorithm
+    protected void executeAlgorithm(int[] mergeSortInput) {
         dispatch.defineClusterNetwork( cluster.getClients() , mergeSortInput.length ); // define each nodes children.
 
         // Create Task in database
@@ -128,14 +123,18 @@ public class Controller {
             createTaskStmt.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
 
-        int[] result = dispatch.executeMergeSort(taskID, cluster.getClients(), mergeSortInput); 
-
-        return result;
+        dispatch.executeMergeSort(taskID, cluster.getClients(), mergeSortInput); 
     } 
 
+    // Called when a merge sort's result has been acquired.
+    protected void mergeSortResult(int[] result) {
+        server.sendMergeSortResult(result);
+    } 
+
+    // Retrieves the set of events that have occured in the most recent task.
     public String getMostRecentTaskEvents() {
         String eventQry = "SELECT * FROM Event e " +
-                             "INNER JOIN ( SELECT max(task_id) ti FROM Task GROUP BY task_id) m " + // Gets task_id of most recently executed task
+                             "INNER JOIN ( SELECT max(task_id) ti FROM Task) m " + // Gets task_id of most recently executed task
                              "ON e.task_id = m.ti";
         String eventsMessage = "eventData|2";
         try {
@@ -161,11 +160,7 @@ public class Controller {
         return eventsMessage;
     } 
 
-    public static void main(String args[]) {
-        Controller c = new Controller();
-        c.interact();
-    }
-
+    // Very simple interface for interaction, can be useful when testing out new algorithms as it will not longer require interaction with the web app.
     public void interact() {
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(System.in));
         int input;
@@ -173,12 +168,6 @@ public class Controller {
         String strInput;
         while (true) {
             System.out.println("\n_________\nAvailable actions:");
-            System.out.println("1: View tasks at each client.");
-            System.out.println("2: Request status update from clients."); 
-            System.out.println("3: View Resource Stats at each client.");
-            System.out.println("4: Execute (Distributed) merge sort."); 
-            System.out.println("5: Execute (single device) merge sort.");
-            System.out.println("6: Print event history.");
             System.out.println("0: Exit.");
             
             input = -1;
@@ -187,74 +176,8 @@ public class Controller {
             System.out.println("_________"); 
 
             switch(input) { 
-            /*    case 6: String eventStmtText = "SELECT * FROM Event";
-                        try {
-                            PreparedStatement eventPStmt = dbConnection.prepareStatement(eventStmtText);
-                            ResultSet eventRs = eventPStmt.executeQuery();
-                            
-                            int row = 1;
-                            while (eventRs.next() ) {
-                                double taskId = eventRs.getDouble("task_id");
-                                String taskStatus = eventRs.getString("status");
-                                String detail = eventRs.getString("detail");
-                                double timestamp = eventRs.getDouble("timestamp");
-                                String ip = eventRs.getString("ip");
-                                short pMem = eventRs.getShort("percentageMemory");
-                                
-                                System.out.println("\nROW " + row + ":\nTask ID:" + taskId + "\nTask Status: " + taskStatus + 
-                                                   "\nDetail: " + detail + "\nTimestamp: "+ timestamp + 
-                                                   "\nIP: " + ip + "\nPercentage Memory: " + pMem);
-                            } 
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            System.out.println("FAILURE: Error executing query to database.");
-                        } 
-
-
-                case 5: int[] msInput = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783,2,61,562,37,48,9,0,49,4};
-                        dispatch.defineClusterNetwork( cluster.getClients(), msInput.length  ); // define each nodes children.
-                        System.out.println("Default list of integers will be used.");
-                        
-                        Client_Intf clients[] = cluster.getClients();
-                        try {
-                            for (int i = 0; i < clients.length; i++) {
-                                if ( !clients[i].getMS().hasChildren() ) { 
-                                    int[] result = dispatch.executeMergeSort(taskId, cluster.getClients(), msInput);
-                                    break;
-                                }
-                            } 
-                        } catch (RemoteException e ) { e.printStackTrace(); }
-                        
-                        break;
-                case 4: int[] mergeSortInput = {6,5,4,3,4,5,6,7,8,7,8,7,8,88,9,8,6,32,1,2,3,44,5,67,76,45,7,9,3,8,26,15,1,783,2,61,562,37,48,9,0,49,4};
-                        dispatch.defineClusterNetwork( cluster.getClients(), mergeSortInput.length ); // define each nodes children.
-                        System.out.println("Default list of integers will be used.");
-
-                        System.out.println("\nInput:") ;
-                        for (int i : mergeSortInput) System.out.print(" " + i);
-
-                        int[] result = dispatch.executeMergeSort(cluster.getClients(), mergeSortInput); 
-
-                        // Write to socket
-
-                        System.out.println("\nSorted List: ");
-                        for (int j : result) System.out.print(" " + j);
-                        break;
-                case 3: if (cluster.size() > 0) cluster.printResourceStats();
-                        else System.out.println("Cluster is empty.");
-                        break;
-                case 2: cluster.requestUpdate();
-                        System.out.println("Update request sent.");
-                        break;
-                case 1: System.out.println("Requesting current task from each client...\n");
-                        if (cluster.size() > 0) cluster.printClusterTasks();
-                        else System.out.println("Cluster is empty.");
-                        break;
-                        */
                 case 0: System.out.println("Exiting...");
                         try {
-                            //outputRoute.close();
-                            //inputRoute.close();
                             server.closeConnections();
                         } catch (Exception e) { 
                             e.printStackTrace(); 
@@ -274,26 +197,5 @@ public class Controller {
     public boolean addClient(Client_Intf c, String hostname) { return cluster.addClient(c, hostname); }
     public boolean removeClient(Client_Intf c) { return cluster.removeClient(c); }
 
-    public HashMap<Client_Intf, Pi> getClusterInfo() { return cluster.getFullDetails(); }
-    public void getClusterHistory() { }
-
     public String getHost() { return host; }
-
-    /*
-    private void setupSocketAndStreams() {
-        try {
-            Socket socket = new socket("localhost", 91); // ensure this port is free to use.
-            System.out.println("Success: Server Socket created successfully.");
-
-            outputRoute = new PrintWriter( serverSocket.getOutputStream(), true);
-            inputRoute =  new BufferedReader( new InputStreamReader( serverSocket.getInputStream() ) );
-            System.out.println("Success: Input and output streams to socket created successfully.");
-            return;
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("FAILURE: Error creating I/O to \"" + host + "\".");
-        } 
-        System.exit(1);
-    } 
-    */
 }

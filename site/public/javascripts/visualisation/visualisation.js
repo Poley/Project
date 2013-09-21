@@ -74,6 +74,7 @@ function update (source) {
     /* *** Creating New Nodes *** */
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
+        .attr("id", function(d) { return "node_" + d.nodeID; } ) 
         .attr("text-anchor", "start")
         .attr("transform", function (d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
         .on("click", click);
@@ -86,25 +87,30 @@ function update (source) {
     nodeEnter.append("text").attr("class", "name")
         .attr("id", "name")
         .attr("x", 10) .attr("y", -4)
-        .text( function (d) { return d.piName; })
+        .text( function (d) { return d.nodeID; })
         .style("fill-opacity", 1e-6);
     
     nodeEnter.append("text").attr("class", "stats")
-        .attr("id", "ID")
-        .attr("x", 15)
-        .attr("y", "1em")
-        .text( function (d) { return "Hostname: " + d.nodeID; });
+        .attr("id", "tStatus")
+        .attr("x", 15) .attr("y", "1em")
+        .text( function (d) { return "Status: " + d.tStatus; });
     
     nodeEnter.append("text").attr("class", "stats")
         .attr("id", "input")
-        .attr("x", 17) .attr("y", "2em")
-        .text( function (d) { return "Input: " + d.input; });
+        .attr("x", 15) .attr("y", "2.2em")
+        .text( function (d) { return "Input:" });
     
     nodeEnter.append("text").attr("class", "stats")
+        .attr("id", "output")
+        .attr("x", 15) .attr("y", "3.35em")
+        .text( function (d) { return "Output: "});
+    
+    /*
+    nodeEnter.append("text").attr("class", "stats")
         .attr("id", "memory")
-        .attr("x", 17) .attr("y", "3.5em")
+        .attr("x", 15) .attr("y", "5em")
         .text( function (d) { return "% Memory Used: " + d.pMem + "%"; });
-
+    */
 
     /* *** Node Transitions (Opening) *** */
     var nodeUpdate = node.transition()
@@ -173,3 +179,7 @@ function click(d) {
     }
     update(d);
 }
+
+function nextEvent() {
+  
+} 

@@ -27,6 +27,8 @@ exports.mergeSort_Input_postHandler = function (req, res) {
         var checkedList = new Array();
         var checkListIndex = 0
         var error=false;
+        eventString = "";
+        eventsOrdered = [];
 
         for (i = 0; i < splitList.length; i++) {
              if ( !isNaN(splitList[i]) ) checkedList[checkListIndex++] = splitList[i]; // isNaN returns false on whitespace
@@ -35,9 +37,12 @@ exports.mergeSort_Input_postHandler = function (req, res) {
         globalList = checkedList; // updating the global variable to the list of that defined in the post request
         console.log(checkedList);
         
-        visReady = false; // Indicates that an executiong of the merge sort is in progress
-        ws.send("getClusterNetwork|1|");
+        visReady = false; // Indicates that an execution of the merge sort is in progress
+        // Pi Manager will execute synchronously, so the cluster
+        ws.send("getClusterNetwork|1|"); 
         ws.send("mergesort|1|2|" + checkedList);
+        
+        // Pi Manager has now been sent requests for tasks, a message handler in app.js will open up the visualisation page once all results have been retrieved.
         res.redirect('/merge_sort/visualisation');
     }; 
 
@@ -45,31 +50,10 @@ exports.mergeSort_Input_postHandler = function (req, res) {
 exports.mergeSort_Visualisation = function (req, res) {
         res.render('mergeVis', { title: "Merge Sort - Visualisation",
                                   stylesheetRef: "/stylesheets/mergeSort.css",
-                                  scripts: ["/javascripts/libraries/d3.v3.min.js", "/javascripts/visualisation/visualisation.js"],
+                                  scripts: ["/javascripts/libraries/d3.v3.min.js", "/javascripts/visualisation/visualisation.js", "/javascripts/visualisation/visPage.js"],
                                   gList: globalList,
-                                  rList: resultList
+                                  rList: resultList,
+                                  events: eventString,
+                                  eventsOrdered: eventsOrdered
                                   } );
     }; 
-
-// CONFIGURATION page
-exports.mergeSort_Configuration = function (req, res) {
-        res.render('mergeConfiguration', { title: "Merge Sort - Configuration",
-                                           stylesheetRef: "/stylesheets/mergeSort.css"
-                                         } );
-    };
-exports.mergeSort_Configuration_postHandler = function (req, res) {
-        cSize = req.body.clusterSize || 0;
-        lSize = req.body.listSize || 0;
-        configured = true;
-        console.log("csize = " + cSize + ". lSize = " + lSize + ".Configured = " + configured);
-        res.redirect('/merge_sort');
-    };
-
-// GRAPH page
-exports.mergeSort_Graphs = function (req, res) {
-       res.render('mergeGraphs', { title: "Merge Sort - Graphs and Statistics",
-                                   stylesheetRef: "/stylesheets/mergeSort.css"
-                                 } );
-    } ;
-
-

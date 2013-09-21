@@ -1,9 +1,11 @@
 package pi_cloud.piManager;
 
+/* This class is used strictly to contribute to the creation of the JSON string that identifies the cluster network.
+   the GSON package used in PiServerSocket translates this object into a JSON string, with all attributes being included within it. Operations are excluded.
+ */
 public class JsonNode {
 
     private String nodeID = "";
-    private String input = "None";
     private JsonNode[] children = new JsonNode[0];
 
     private boolean hasChildren = false;
@@ -13,7 +15,7 @@ public class JsonNode {
         nodeID = id;
     } 
 
-    public void addChild(JsonNode childID){
+    protected void addChild(JsonNode childID){
         if (children.length == 0) {
             children = new JsonNode[1];
             children[0] = childID; 
@@ -26,8 +28,7 @@ public class JsonNode {
         hasChildren = true;
     } 
     
-    private boolean hasChildren() { return hasChildren; } 
-    public boolean hasParent() { return hasParent; }
-    public void giveParent() { hasParent = true; }
-    public short childrenSize() { return (short) children.length; } 
+    protected boolean hasChildren() { return hasChildren; } 
+    protected boolean hasParent() { return hasParent; }
+    protected void giveParent() { hasParent = true; }
 } 

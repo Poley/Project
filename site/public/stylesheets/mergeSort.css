@@ -123,7 +123,7 @@ body {
 .configForm label {
   margin-right: 0.32em;
 }
-.configForm input[name="submitButton"] {
+.configForm .submitButton input {
   margin: 0.3em;
   margin-left: 0.5em;
   width: 37em;
@@ -153,13 +153,13 @@ body {
   padding-left: 0.4em;
   padding-right: 0.4em;
 }
-#submitButton {
+.submitButton {
   -webkit-border-radius: 5px;
   -webkit-transition: all 0.2s ease;
   -moz-border-radius: 5px;
   -moz-transition: all 0.2s ease;
 }
-#submitButton:hover {
+.submitButton:hover {
   background-color: #334037;
   color: #fff;
 }

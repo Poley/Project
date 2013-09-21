@@ -10,12 +10,12 @@ import java.io.Serializable;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+/* Pi Manager dispatcher communcicates with this client class, which handles executiong of algorithms.
+ */
 public class Client extends UnicastRemoteObject implements Client_Intf, Serializable {
 
     private Dispatcher_Intf dispatch;
-    //private StatusMonitor_Intf sm;
     private StatusMonitor sm;
-    private boolean busy;
 
     private String localHost;
     private String serverAddress;
@@ -57,62 +57,29 @@ public class Client extends UnicastRemoteObject implements Client_Intf, Serializ
         System.out.println();
     }
 
-    public void interact() {
-        BufferedReader inputStream = new BufferedReader( new InputStreamReader(System.in) );
-        int input = -1;
-        boolean success= false;
-            
-        while (true) {
-            System.out.println("_____");
-            System.out.println("Available Actions: ");
-            System.out.println("1: Update Resource Statistics.");
-            System.out.println("2: Print client details.");
-            System.out.println("0: Exit.");
-
-            try { input = Integer.parseInt( inputStream.readLine());
-            } catch (Exception e) { System.out.println("ERROR: Unrecognised Input."); } 
-            System.out.println("_____\n");
-            
-            int[] list = {5,3,2,1,4,6,10,105,3,6,23,1,0,12};
-
-            switch (input) {
-                case 2: printDetails();
-                        break;
-                case 1: if (sm.updateResourceStats()) System.out.println("Resource stats updated."); 
-                        break;
-                case 0: try { 
-                            if ( dispatch.unRegister (this) ) System.out.println("Client unregistered from server. Now exiting...");
-                            else System.out.println("Error unregistering from server. Continuing to exit...");
-                        } catch (RemoteException e){};
-                        System.exit(1);
-                default: System.out.println("ERROR: Entered option unavailable.");
-                         continue;
-            }
-        }
+    public void executeMergeSort(long taskID, int[] input) throws RemoteException {
+        mergeS.sort(this, null, taskID, input, true);
     }
 
-    public int[] executeMergeSort(long taskID, int[] input) throws RemoteException {
-        int[] result = mergeS.sort(taskID, input);
-        sm.refreshDefaultValues(); // Means the next execution won't contain old values
-        return mergeS.sort(taskID, input);
-    }
-
-    public void printDetails() {
-        System.out.println("Host: " + localHost);
-        System.out.println();
-        sm.printTaskDetails();
-        System.out.println();
-        sm.printResourceDetails();
+    // Called when a algorithm has finished execution.
+    public void taskFinished(int[] result) {
+        try {
+            dispatch.mergeSortResult(result);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } 
     } 
 
+    // Returns the hostname of all the children the MergeSorter class has.
     public String[] getMSChildHostnames() { 
+        String[] children = new String[0];
         try {
-            String[] children = mergeS.getChildHostnames();
+            children = mergeS.getChildHostnames();
             return children;
         } catch (RemoteException e) {
             e.printStackTrace();
         } 
-        return new String[0];
+        return children;
      }
 
     /* Getters & Setters */
