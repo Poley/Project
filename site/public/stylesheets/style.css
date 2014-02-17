@@ -1,0 +1,45 @@
+body {
+  padding: 15px;
+  font: 14px "Verdana";
+}
+.header {
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  font: 16px "Verdana";
+  text-align: center;
+}
+#navContainer {
+  text-align: center;
+  padding: 1em;
+  position: relative;
+  display: block;
+}
+#navContainer ul {
+  list-style: none;
+  height: 80px;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#navContainer li {
+  background-color: #036;
+  color: #fff;
+  height: 80px;
+  width: 50%;
+  float: left;
+  cursor: pointer;
+}
+#navContainer li:hover {
+  color: #fff;
+  background-color: #369;
+}
+.listContainer {
+  margin-left: auto;
+  margin-right: auto;
+  width: 600px;
+}
+.navItem {
+  width: 100%;
+  margin-top: 1.7em;
+}

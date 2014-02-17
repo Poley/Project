@@ -1,0 +1,250 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'install', 'jade' ]
+2 info using npm@1.3.14
+3 info using node@v0.10.22
+4 verbose readDependencies using package.json deps
+5 verbose cache add [ 'jade@*', null ]
+6 verbose cache add name=undefined spec="jade@*" args=["jade@*",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'jade@*',
+7 verbose parsed url   path: 'jade@*',
+7 verbose parsed url   href: 'jade@*' }
+8 verbose cache add name="jade" spec="*" args=["jade","*"]
+9 verbose parsed url { protocol: null,
+9 verbose parsed url   slashes: null,
+9 verbose parsed url   auth: null,
+9 verbose parsed url   host: null,
+9 verbose parsed url   port: null,
+9 verbose parsed url   hostname: null,
+9 verbose parsed url   hash: null,
+9 verbose parsed url   search: null,
+9 verbose parsed url   query: null,
+9 verbose parsed url   pathname: '*',
+9 verbose parsed url   path: '*',
+9 verbose parsed url   href: '*' }
+10 verbose addNamed [ 'jade', '*' ]
+11 verbose addNamed [ null, '*' ]
+12 silly lockFile ad03ed78-jade jade@*
+13 verbose lock jade@* /home/pole/.npm/ad03ed78-jade.lock
+14 silly addNameRange { name: 'jade', range: '*', hasData: false }
+15 verbose url raw jade
+16 verbose url resolving [ 'https://registry.npmjs.org/', './jade' ]
+17 verbose url resolved https://registry.npmjs.org/jade
+18 info trying registry request attempt 1 at 18:17:35
+19 verbose etag "6TVF71UBDBWVND0FRCR88S1V5"
+20 http GET https://registry.npmjs.org/jade
+21 http 200 https://registry.npmjs.org/jade
+22 silly registry.get cb [ 200,
+22 silly registry.get   { date: 'Sun, 16 Feb 2014 18:17:35 GMT',
+22 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B)',
+22 silly registry.get     etag: '"DC5ZIS6H4B56NT809AUWPIOC1"',
+22 silly registry.get     'content-type': 'application/json',
+22 silly registry.get     via: '1.1 varnish',
+22 silly registry.get     'cache-control': 'max-age=1',
+22 silly registry.get     'content-length': '107344',
+22 silly registry.get     'accept-ranges': 'bytes',
+22 silly registry.get     age: '301',
+22 silly registry.get     'x-served-by': 'cache-v42-ASH, cache-am70-AMS',
+22 silly registry.get     'x-cache': 'HIT, MISS',
+22 silly registry.get     'x-cache-hits': '1, 0',
+22 silly registry.get     'x-timer': 'S1392530840.464701891,VS0,VS55,VE71,VE43815030',
+22 silly registry.get     vary: 'Accept',
+22 silly registry.get     'keep-alive': 'timeout=10, max=50',
+22 silly registry.get     connection: 'Keep-Alive' } ]
+23 silly addNameRange number 2 { name: 'jade', range: '*', hasData: true }
+24 silly addNameRange versions [ 'jade',
+24 silly addNameRange   [ '0.0.1',
+24 silly addNameRange     '0.0.2',
+24 silly addNameRange     '0.1.0',
+24 silly addNameRange     '0.2.0',
+24 silly addNameRange     '0.2.1',
+24 silly addNameRange     '0.2.2',
+24 silly addNameRange     '0.2.3',
+24 silly addNameRange     '0.2.4',
+24 silly addNameRange     '0.3.0',
+24 silly addNameRange     '0.4.0',
+24 silly addNameRange     '0.4.1',
+24 silly addNameRange     '0.5.0',
+24 silly addNameRange     '0.5.1',
+24 silly addNameRange     '0.5.2',
+24 silly addNameRange     '0.5.3',
+24 silly addNameRange     '0.5.4',
+24 silly addNameRange     '0.5.5',
+24 silly addNameRange     '0.5.6',
+24 silly addNameRange     '0.5.7',
+24 silly addNameRange     '0.6.0',
+24 silly addNameRange     '0.6.1',
+24 silly addNameRange     '0.6.3',
+24 silly addNameRange     '0.7.0',
+24 silly addNameRange     '0.7.1',
+24 silly addNameRange     '0.8.0',
+24 silly addNameRange     '0.8.1',
+24 silly addNameRange     '0.8.2',
+24 silly addNameRange     '0.8.3',
+24 silly addNameRange     '0.8.4',
+24 silly addNameRange     '0.8.5',
+24 silly addNameRange     '0.8.6',
+24 silly addNameRange     '0.8.7',
+24 silly addNameRange     '0.8.8',
+24 silly addNameRange     '0.8.9',
+24 silly addNameRange     '0.9.0',
+24 silly addNameRange     '0.9.1',
+24 silly addNameRange     '0.9.2',
+24 silly addNameRange     '0.9.3',
+24 silly addNameRange     '0.10.0',
+24 silly addNameRange     '0.10.1',
+24 silly addNameRange     '0.10.2',
+24 silly addNameRange     '0.10.3',
+24 silly addNameRange     '0.10.4',
+24 silly addNameRange     '0.10.5',
+24 silly addNameRange     '0.10.6',
+24 silly addNameRange     '0.10.7',
+24 silly addNameRange     '0.11.0',
+24 silly addNameRange     '0.11.1',
+24 silly addNameRange     '0.12.0',
+24 silly addNameRange     '0.12.1',
+24 silly addNameRange     '0.12.2',
+24 silly addNameRange     '0.12.3',
+24 silly addNameRange     '0.12.4',
+24 silly addNameRange     '0.13.0',
+24 silly addNameRange     '0.14.0',
+24 silly addNameRange     '0.14.1',
+24 silly addNameRange     '0.14.2',
+24 silly addNameRange     '0.15.0',
+24 silly addNameRange     '0.15.1',
+24 silly addNameRange     '0.15.2',
+24 silly addNameRange     '0.15.3',
+24 silly addNameRange     '0.15.4',
+24 silly addNameRange     '0.16.0',
+24 silly addNameRange     '0.16.1',
+24 silly addNameRange     '0.16.2',
+24 silly addNameRange     '0.16.3',
+24 silly addNameRange     '0.16.4',
+24 silly addNameRange     '0.17.0',
+24 silly addNameRange     '0.18.0',
+24 silly addNameRange     '0.19.0',
+24 silly addNameRange     '0.20.0',
+24 silly addNameRange     '0.20.1',
+24 silly addNameRange     '0.20.2',
+24 silly addNameRange     '0.20.3',
+24 silly addNameRange     '0.21.0',
+24 silly addNameRange     '0.22.0',
+24 silly addNameRange     '0.22.1',
+24 silly addNameRange     '0.23.0',
+24 silly addNameRange     '0.24.0',
+24 silly addNameRange     '0.25.0',
+24 silly addNameRange     '0.26.0',
+24 silly addNameRange     '0.26.1',
+24 silly addNameRange     '0.26.2',
+24 silly addNameRange     '0.26.3',
+24 silly addNameRange     '0.27.0',
+24 silly addNameRange     '0.27.1',
+24 silly addNameRange     '0.27.2',
+24 silly addNameRange     '0.27.3',
+24 silly addNameRange     '0.27.4',
+24 silly addNameRange     '0.27.5',
+24 silly addNameRange     '0.27.6',
+24 silly addNameRange     '0.27.7',
+24 silly addNameRange     '0.28.0',
+24 silly addNameRange     '0.28.1',
+24 silly addNameRange     '0.28.2',
+24 silly addNameRange     '0.29.0',
+24 silly addNameRange     '0.30.0',
+24 silly addNameRange     '0.31.0',
+24 silly addNameRange     '0.31.1',
+24 silly addNameRange     '0.31.2',
+24 silly addNameRange     '0.32.0',
+24 silly addNameRange     '0.33.0',
+24 silly addNameRange     '0.34.0',
+24 silly addNameRange     '0.34.1',
+24 silly addNameRange     '0.35.0',
+24 silly addNameRange     '1.0.0',
+24 silly addNameRange     '1.0.1',
+24 silly addNameRange     '1.0.2',
+24 silly addNameRange     '1.1.0',
+24 silly addNameRange     '1.1.1',
+24 silly addNameRange     '1.1.2',
+24 silly addNameRange     '1.1.3',
+24 silly addNameRange     '1.1.4',
+24 silly addNameRange     '1.1.5' ] ]
+25 verbose addNamed [ 'jade', '1.1.5' ]
+26 verbose addNamed [ '1.1.5', '1.1.5' ]
+27 silly lockFile e2f963db-jade-1-1-5 jade@1.1.5
+28 verbose lock jade@1.1.5 /home/pole/.npm/e2f963db-jade-1-1-5.lock
+29 silly lockFile e2f963db-jade-1-1-5 jade@1.1.5
+30 silly lockFile e2f963db-jade-1-1-5 jade@1.1.5
+31 silly lockFile ad03ed78-jade jade@*
+32 silly lockFile ad03ed78-jade jade@*
+33 silly resolved [ { name: 'jade',
+33 silly resolved     description: 'Jade template engine',
+33 silly resolved     version: '1.1.5',
+33 silly resolved     author: { name: 'TJ Holowaychuk', email: 'tj@vision-media.ca' },
+33 silly resolved     repository: { type: 'git', url: 'git://github.com/visionmedia/jade' },
+33 silly resolved     main: './index.js',
+33 silly resolved     bin: { jade: './bin/jade.js' },
+33 silly resolved     man: [ './jade.1' ],
+33 silly resolved     dependencies:
+33 silly resolved      { commander: '2.1.0',
+33 silly resolved        mkdirp: '~0.3.5',
+33 silly resolved        transformers: '2.1.0',
+33 silly resolved        'character-parser': '1.2.0',
+33 silly resolved        monocle: '1.1.51',
+33 silly resolved        with: '~2.0.0',
+33 silly resolved        constantinople: '~1.0.2' },
+33 silly resolved     devDependencies:
+33 silly resolved      { 'coffee-script': '*',
+33 silly resolved        mocha: '*',
+33 silly resolved        markdown: '*',
+33 silly resolved        stylus: '*',
+33 silly resolved        should: '*',
+33 silly resolved        less: '*',
+33 silly resolved        'uglify-js': '*',
+33 silly resolved        browserify: '*',
+33 silly resolved        linify: '*' },
+33 silly resolved     component: { scripts: [Object] },
+33 silly resolved     scripts:
+33 silly resolved      { test: 'mocha -R spec',
+33 silly resolved        prepublish: 'npm prune && linify transform bin && npm run build',
+33 silly resolved        build: 'npm run compile',
+33 silly resolved        compile: 'npm run compile-full && npm run compile-runtime',
+33 silly resolved        'compile-full': 'browserify ./lib/jade.js --standalone jade -x ./node_modules/transformers > jade.js',
+33 silly resolved        'compile-runtime': 'browserify ./lib/runtime.js --standalone jade > runtime.js' },
+33 silly resolved     browser: { './lib/filters.js': './lib/filters-client.js' },
+33 silly resolved     readme: '# [![Jade - template engine ](http://i.imgur.com/5zf2aVt.png)](http://jade-lang.com/)\n\nFull documentation is at [jade-lang.com](http://jade-lang.com/)\n\n Jade is a high performance template engine heavily influenced by [Haml](http://haml-lang.com)\n and implemented with JavaScript for [node](http://nodejs.org). For discussion join the [Google Group](http://groups.google.com/group/jadejs).\n\n You can test drive Jade online [here](http://naltatis.github.com/jade-syntax-docs).\n\n [![Build Status](https://travis-ci.org/visionmedia/jade.png?branch=master)](https://travis-ci.org/visionmedia/jade)\n [![Dependency Status](https://gemnasium.com/visionmedia/jade.png)](https://gemnasium.com/visionmedia/jade)\n [![NPM version](https://badge.fury.io/js/jade.png)](http://badge.fury.io/js/jade)\n\n## Announcements\n\n**Deprecation of implicit script/style text-only:**\n\n Jade version 0.31.0 deprecated implicit text only support for scripts and styles.  To fix this all you need to do is add a `.` character after the script or style tag.\n\n It is hoped that this change will make Jade easier for newcomers to learn without affecting the power of the language or leading to excessive verboseness.\n\n If you have a lot of Jade files that need fixing you can use [fix-jade](https://github.com/ForbesLindesay/fix-jade) to attempt to automate the process.\n\n**Command line option change:**\n\nsince `v0.31.0`, `-o` is preferred for `--out` where we used `-O` before.\n\n## Installation\n\nvia npm:\n\n```bash\n$ npm install jade\n```\n\n## Syntax\n\nJade is a clean, whitespace sensitive syntax for writing html.  Here is a simple example:\n\n```jade\ndoctype html\nhtml(lang="en")\n  head\n    title= pageTitle\n    script(type=\'text/javascript\').\n      if (foo) bar(1 + 5)\n  body\n    h1 Jade - node template engine\n    #container.col\n      if youAreUsingJade\n        p You are amazing\n      else\n        p Get on it!\n      p.\n        Jade is a terse and simple templating language with a\n        strong focus on performance and powerful features.\n```\n\nbecomes\n\n\n```html\n<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <title>Jade</title>\n    <script type="text/javascript">\n      if (foo) bar(1 + 5)\n    </script>\n  </head>\n  <body>\n    <h1>Jade - node template engine</h1>\n    <div id="container" class="col">\n      <p>You are amazing</p>\n      <p>Jade is a terse and simple templating language with a strong focus on performance and powerful features.</p>\n    </div>\n  </body>\n</html>\n```\n\nThe official [jade tutorial](http://jade-lang.com/tutorial/) is a great place to start.  While that (and the syntax documentation) is being finished, you can view some of the old documentation [here](https://github.com/visionmedia/jade/blob/master/jade.md) and [here](https://github.com/visionmedia/jade/blob/master/jade-language.md)\n\n## API\n\nFor full API, see [jade-lang.com/api](http://jade-lang.com/api/)\n\n```js\nvar jade = require(\'jade\');\n\n// compile\nvar fn = jade.compile(\'string of jade\', options);\nvar html = fn(locals);\n\n// render\nvar html = jade.render(\'string of jade\', merge(options, locals));\n\n// renderFile\nvar html = jade.renderFile(\'filename.jade\', merge(options, locals));\n```\n\n### Options\n\n - `filename`  Used in exceptions, and required when using includes\n - `compileDebug`  When `false` no debug instrumentation is compiled\n - `pretty`    Add pretty-indentation whitespace to output _(false by default)_\n\n## Browser Support\n\n The latest version of jade can be download for the browser in standalone form from [here](https://github.com/visionmedia/jade/raw/master/jade.js).  It only supports the very latest browsers though, and is a large file.  It is recommended that you pre-compile your jade templates to JavaScript and then just use the [runtime.js](https://github.com/visionmedia/jade/raw/master/runtime.js) library on the client.\n\n To compile a template for use on the client using the command line, do:\n\n```console\n$ jade --client --no-debug filename.jade\n```\n\nwhich will produce `filename.js` containing the compiled template.\n\n## Command Line\n\nAfter installing the latest version of [node](http://nodejs.org/), install with:\n\n```console\n$ npm install jade -g\n```\n\nand run with\n\n```console\n$ jade --help\n```\n\n## Additional Resources\n\nTutorials:\n\n  - cssdeck interactive [Jade syntax tutorial](http://cssdeck.com/labs/learning-the-jade-templating-engine-syntax)\n  - cssdeck interactive [Jade logic tutorial](http://cssdeck.com/labs/jade-templating-tutorial-codecast-part-2)\n  - in [Japanese](http://blog.craftgear.net/4f501e97c1347ec934000001/title/10%E5%88%86%E3%81%A7%E3%82%8F%E3%81%8B%E3%82%8Bjade%E3%83%86%E3%83%B3%E3%83%97%E3%83%AC%E3%83%BC%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%B3)\n\n\nImplementations in other languages:\n\n  - [php](http://github.com/everzet/jade.php)\n  - [scala](http://scalate.fusesource.org/versions/snapshot/documentation/scaml-reference.html)\n  - [ruby](https://github.com/slim-template/slim)\n  - [python](https://github.com/SyrusAkbary/pyjade)\n  - [java](https://github.com/neuland/jade4j)\n\nOther:\n\n  - [Emacs Mode](https://github.com/brianc/jade-mode)\n  - [Vim Syntax](https://github.com/digitaltoad/vim-jade)\n  - [TextMate Bundle](http://github.com/miksago/jade-tmbundle)\n  - [Coda/SubEtha syntax Mode](https://github.com/aaronmccall/jade.mode)\n  - [Screencasts](http://tjholowaychuk.com/post/1004255394/jade-screencast-template-engine-for-nodejs)\n  - [html2jade](https://github.com/donpark/html2jade) converter\n\n## License\n\nMIT\n',
+33 silly resolved     readmeFilename: 'README.md',
+33 silly resolved     bugs: { url: 'https://github.com/visionmedia/jade/issues' },
+33 silly resolved     homepage: 'https://github.com/visionmedia/jade',
+33 silly resolved     _id: 'jade@1.1.5',
+33 silly resolved     _from: 'jade@*' } ]
+34 info install jade@1.1.5 into /home/pole/raspberry-pi-cloud-educational-tool-internship/site
+35 info installOne jade@1.1.5
+36 info /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/jade unbuild
+37 info preuninstall jade@0.34.1
+38 info uninstall jade@0.34.1
+39 verbose true,/home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules,/home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules unbuild jade@0.34.1
+40 verbose /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/.bin,[object Object] binRoot
+41 info /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/jade unbuild
+42 info preuninstall jade@0.34.1
+43 info uninstall jade@0.34.1
+44 verbose true,/home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules,/home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules unbuild jade@0.34.1
+45 verbose /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/.bin,[object Object] binRoot
+46 info postuninstall jade@0.34.1
+47 error Refusing to delete: /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/.bin/jade not in /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/jade
+File exists: /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/.bin/jade
+Move it away, and try again.
+48 error System Linux 3.11.0-15-generic
+49 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "jade"
+50 error cwd /home/pole/raspberry-pi-cloud-educational-tool-internship/site/views
+51 error node -v v0.10.22
+52 error npm -v 1.3.14
+53 error path /home/pole/raspberry-pi-cloud-educational-tool-internship/site/node_modules/.bin/jade
+54 error code EEXIST
+55 verbose exit [ 1, true ]

@@ -1,0 +1,201 @@
+package pi_cloud.piManager;
+
+import pi_cloud.piClient.*;
+import java.rmi.*;
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.registry.*;
+import java.net.*;
+
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+
+import java.io.*; // may not need this
+
+import org.java_websocket.server.*;
+import org.java_websocket.server.DefaultWebSocketServerFactory;
+
+/* This class co-ordinates communcation between the web server and all clients.
+   It sets up the database, RMI objects and web socket communcation. 
+   Run this class to start the Pi Manager.
+ */
+public class Controller {
+    
+    private Cluster cluster;
+    private Dispatcher dispatch;
+    private Connection dbConnection; // Connection to database
+
+    private String host; 
+    private short port = 1099;
+
+    private PiServerSocket server = null;
+
+    public Controller() {
+        // Finding local IP address
+        try {
+            NetworkInterface ni = NetworkInterface.getByName("eth1");
+            Enumeration<InetAddress> inetAddresses = ni.getInetAddresses();
+
+            while (inetAddresses.hasMoreElements() ) {
+                InetAddress ia = inetAddresses.nextElement();
+                if(!ia.isLinkLocalAddress() ) {
+                    host = ia.getHostAddress();
+                    System.out.println("Local IP Address: " + host); 
+                } 
+            } 
+        } catch (Exception e) {
+            System.out.println("FAILURE: Error acquiring local ip address.");
+            e.printStackTrace();
+        } 
+
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager() );
+            System.out.println("Success: RMI Security Manager created.");
+        } 
+        
+        // Connecting to database
+        try {
+            // Connects to the database named "pi_cloud" on the local server.
+            dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/piCloud" + "?user=piAdmin&password=pi_cloud");
+            System.out.println("Success: Connection to database established.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("FAILURE: Connection to database has failed.");
+            System.exit(1);
+        } 
+        
+        // Setting up RMI
+        try {
+            Registry reg = LocateRegistry.createRegistry( port);
+            cluster = new Cluster(host, port, reg, dbConnection); // cluster exports and binds status manager
+            
+            dispatch = new Dispatcher(this);
+            UnicastRemoteObject.unexportObject(dispatch, true);
+            Dispatcher_Intf registryStub = (Dispatcher_Intf) UnicastRemoteObject.exportObject(dispatch, port);
+            System.out.println("Success: Dispatcher exported to RMI registry.");
+            
+            //Naming.rebind("//" + host + ":" + port + "/Dispatcher", registryStub);
+            reg.rebind("Dispatcher", registryStub);
+            System.out.println("Success: Dispatcher bound to RMI object reference.");
+            System.out.println("Success: PiManager created.");
+        } catch (RemoteException e) {
+            System.out.println("FAILURE: Controller.java: Error exporting dispatcher to registry.");
+            e.printStackTrace();
+        }
+
+        connectAndListenToPort();
+    }
+    
+    public static void main(String args[]) {
+        Controller c = new Controller();
+        c.interact();
+    }
+
+    // Sets up the socket which the web server can then connect to.
+    public void connectAndListenToPort() {
+        try {
+            server = new PiServerSocket( new InetSocketAddress("localhost", 4444), this );
+            System.out.println( server.getAddress() );
+            
+            server.setWebSocketFactory( new DefaultWebSocketServerFactory() );
+            server.start();
+        } catch (Exception e) { 
+            e.printStackTrace();
+        }
+    } 
+
+    // Initiates the execution of a merge sort algorithm
+    protected void executeAlgorithm(int[] mergeSortInput) {
+        dispatch.defineClusterNetwork( cluster.getClients() , mergeSortInput.length ); // define each nodes children.
+
+        // Create Task in database
+        long taskID = System.currentTimeMillis();
+        String taskCreateStr = "INSERT INTO Task (task_id, type) VALUES ('" + taskID + "', 'MergeSort');";
+        try {
+            PreparedStatement createTaskStmt = dbConnection.prepareStatement(taskCreateStr);
+            createTaskStmt.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        dispatch.executeMergeSort(taskID, cluster.getClients(), mergeSortInput); 
+    } 
+
+    // Called when a merge sort's result has been acquired.
+    protected void mergeSortResult(int[] result) {
+        server.sendMergeSortResult(result);
+    } 
+
+    // Retrieves the set of events that have occured in the most recent task.
+    public String getMostRecentTaskEvents() {
+        String eventQry = "SELECT * FROM Event e " +
+                             "INNER JOIN ( SELECT max(task_id) ti FROM Task) m " + // Gets task_id of most recently executed task
+                             "ON e.task_id = m.ti";
+        String eventsMessage = "eventData|2";
+        try {
+            PreparedStatement eventStmt = dbConnection.prepareStatement(eventQry);
+            ResultSet eventRs = eventStmt.executeQuery();
+
+            while (eventRs.next()) {
+                eventsMessage += "|" + eventRs.getDouble("task_id") + "|";
+                eventsMessage += eventRs.getString("status") + "|";
+                eventsMessage += eventRs.getString("input") + "|";
+                eventsMessage += eventRs.getString("output") + "|";
+                eventsMessage += eventRs.getLong("timestamp") + "|";
+                eventsMessage += eventRs.getString("ip") + "|";
+                eventsMessage += eventRs.getShort("percentageMemory");
+            } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Controller.java: Error executing query to retrieve most recent task events.");
+            System.exit(1);
+        } 
+
+
+        return eventsMessage;
+    } 
+
+    // Very simple interface for interaction, can be useful when testing out new algorithms as it will not longer require interaction with the web app.
+    public void interact() {
+        BufferedReader inputStream = new BufferedReader(new InputStreamReader(System.in));
+        int input;
+
+        String strInput;
+        while (true) {
+            System.out.println("\n_________\nAvailable actions:");
+            System.out.println("0: Exit.");
+            
+            input = -1;
+            try { input = Integer.parseInt(inputStream.readLine() ); } 
+            catch (Exception e) { System.out.println("Error parsing input."); e.printStackTrace();  } 
+            System.out.println("_________"); 
+
+            switch(input) { 
+                case 0: System.out.println("Exiting...");
+                        try {
+                            server.closeConnections();
+                        } catch (Exception e) { 
+                            e.printStackTrace(); 
+                            System.out.println("FAILURE: Error closing socket and streams."); 
+                        }
+                        System.exit(1);
+                default:System.out.println("Error: Unrecognised Input.");
+                        continue;
+            } 
+        } 
+    } 
+
+    public HashMap<String, String[]> getClusterNetwork() {
+        return dispatch.getClusterNetwork(cluster.getClients() );
+    } 
+
+    public boolean addClient(Client_Intf c, String hostname) { return cluster.addClient(c, hostname); }
+    public boolean removeClient(Client_Intf c) { return cluster.removeClient(c); }
+
+    public String getHost() { return host; }
+}

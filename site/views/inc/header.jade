@@ -1,0 +1,6 @@
+head
+  title= title
+  link(rel='stylesheet', href= stylesheetRef)
+  
+  -each script in globalScripts
+    script(type="text/javascript", src=script)

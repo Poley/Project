@@ -1,0 +1,20 @@
+doctype 5
+html
+  include inc/header
+
+  body
+    div#base
+      div#header #{title}
+
+      div#top
+        ul
+          li 
+            a(href="/merge_sort/input") Input
+          li 
+            a(href="/merge_sort/visualisation") Visualisation
+          
+      div#center
+        block content
+     
+    include inc/footer
+
