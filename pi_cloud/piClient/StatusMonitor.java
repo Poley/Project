@@ -137,7 +137,7 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
             line = br.readLine();
             res = line.split("\\s+"); 
             for (int i = 0; i < res.length; i++) {
-                System.out.println(i + ": " + res[i]);
+                //System.out.println(i + ": " + res[i]);
                 switch (i) {
                     //case 7: DRS = Integer.parseInt(res[i]); //System.out.println("Initial DRS: " + DRS);
                             //continue;

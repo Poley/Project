@@ -46,7 +46,8 @@ ws = new webSocket.Client('ws://localhost:4444' );
 
 ws.on('open', function(event){
             console.log('Connection to PiManager has been made.\n');
-            ws.send("recentTasks|1");	
+            ws.send("recentTasks|1"); //Updates list of recent tasks
+            ws.send("getClusterNetwork|1|"); //Gets cluster network	
         });
 
 ws.on('message', function(event) {
@@ -69,12 +70,14 @@ ws.on('message', function(event) {
                 for (i=2; i<splitMessage.length; i++) {
                     eventString += splitMessage[i] + "|";
                 } 
+		recentTasks.push(splitMessage[3]);
+		var i = recentTasks.shift();
                 console.log( "\n" + eventString);
                 //console.log("Event data received and dictionary created.");
                 //console.log( eventDictionary);
             } else if (splitMessage[0]=="recentTasks" && splitMessage[1]=="2") {
                 for (i=2; i<splitMessage.length; i++) {
-                    recentTasks += splitMessage[i] + "|";
+                    recentTasks.push(splitMessage[i]);
                 } 
                 console.log( "\n" + recentTasks);
             } 
