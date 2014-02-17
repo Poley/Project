@@ -83,8 +83,14 @@ public class PiServerSocket extends WebSocketServer {
         } else if (splitlist[0].contains("eventData") && splitlist[1].contains("1") ) { // Recieved a request to send event data on most recent task execution
             String events = controller.getMostRecentTaskEvents();
             conn.send(events);
+        } else if (splitlist[0].contains("previousEventData") && splitlist[1].contains("1") ) { // Recieved a request to send event data on previous task
+            String events = controller.getPreviousTaskEvents(splitlist[2]);
+            conn.send(events);
+        } else if (splitlist[0].contains("recentTasks") && splitlist[1].contains("1") ) { // Recieved a request to send event data on previous task
+            String task_ids = controller.getMostRecentTaskIDs();
+            conn.send(task_ids);
         } 
-
+        
     } 
 
     // Called when there is an error across the socket channel.

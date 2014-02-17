@@ -15,7 +15,6 @@ exports.mergeSort_Home = function (req, res) {
 
 // INPUT page
 exports.mergeSort_Input = function (req, res) {
-	ws.send("getClusterNetwork|1|");
         res.render('mergeInput', { title: "Merge Sort - Input", 
                                   stylesheetRef: "/stylesheets/mergeSort.css", 
                                    gList: globalList
@@ -42,7 +41,8 @@ exports.mergeSort_Input_postHandler = function (req, res) {
         
         visReady = false; // Indicates that an execution of the merge sort is in progress
         // Pi Manager will execute synchronously, so the cluster
-         
+        
+	ws.send("getClusterNetwork|1|"); 
         ws.send("mergesort|1|2|" + checkedList);
         
         // Pi Manager has now been sent requests for tasks, a message handler in app.js will open up the visualisation page once all results have been retrieved.

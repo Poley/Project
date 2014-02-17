@@ -130,8 +130,39 @@ public class Controller {
     protected void mergeSortResult(int[] result) {
         server.sendMergeSortResult(result);
     } 
+    
+    // Retrieves the set of events that have occurred in a specific task.
+    public String getPreviousTaskEvents(String id){
+    	
+    	String eventQry = "SELECT * FROM Event e " +
+    			"INNER JOIN ( SELECT task_id AS ti FROM Task WHERE task_id = ?) m " + // ? is the task id passed as a parameter
+    			"ON e.task_id = m.ti";
+    	String eventsMessage = "eventData|2";
+    	try {
+    		PreparedStatement eventStmt = dbConnection.prepareStatement(eventQry);
+    		eventStmt.setString(1,  id);
+    		ResultSet eventRs = eventStmt.executeQuery();
 
-    // Retrieves the set of events that have occured in the most recent task.
+    		while (eventRs.next()) {
+    			eventsMessage += "|" + eventRs.getDouble("task_id") + "|";
+    			eventsMessage += eventRs.getString("status") + "|";
+    			eventsMessage += eventRs.getString("input") + "|";
+    			eventsMessage += eventRs.getString("output") + "|";
+    			eventsMessage += eventRs.getLong("timestamp") + "|";
+    			eventsMessage += eventRs.getString("ip") + "|";
+    			eventsMessage += eventRs.getShort("percentageMemory");
+    		} 
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    		System.out.println("Controller.java: Error executing query to retrieve task " + id);
+    		System.exit(1);
+    	} 
+
+    	System.out.println(eventsMessage);
+    	return eventsMessage;
+    }
+
+    // Retrieves the set of events that have occurred in the most recent task.
     public String getMostRecentTaskEvents() {
         String eventQry = "SELECT * FROM Event e " +
                              "INNER JOIN ( SELECT max(task_id) ti FROM Task) m " + // Gets task_id of most recently executed task
@@ -160,6 +191,29 @@ public class Controller {
         return eventsMessage;
     } 
 
+    //Gets the 10 most recent task IDs
+    public String getMostRecentTaskIDs() {
+        String eventQry = "SELECT task_id " +
+                             "FROM Task " + 
+                             "ORDER BY task_id DESC " +
+                             "LIMIT 10";
+        String recentTasks = "recentTasks|2";
+        try {
+            PreparedStatement eventStmt = dbConnection.prepareStatement(eventQry);
+            ResultSet eventRs = eventStmt.executeQuery();
+
+            while (eventRs.next()) {
+            	recentTasks += "|" + eventRs.getDouble("task_id");
+            } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Controller.java: Error executing query to retrieve most recent task events.");
+            System.exit(1);
+        } 
+
+        System.out.println(recentTasks);
+        return recentTasks;
+    } 
     // Very simple interface for interaction, can be useful when testing out new algorithms as it will not longer require interaction with the web app.
     public void interact() {
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(System.in));

@@ -49,6 +49,13 @@ exports.mergeSort_Input_postHandler = function (req, res) {
         res.redirect('/merge_sort/visualisation');
     }; 
 
+exports.mergeSort_History = function (req, res) {
+        res.render('mergeHistory', { title: "Merge Sort - History", 
+                                  stylesheetRef: "/stylesheets/mergeSort.css", 
+                                   tList: recentTasks
+                                 });
+    };
+
 // VISUALISATION page
 exports.mergeSort_Visualisation = function (req, res) {
         res.render('mergeVis', { title: "Merge Sort - Visualisation",

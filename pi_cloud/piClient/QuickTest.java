@@ -3,6 +3,11 @@ package pi_cloud.piClient;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class QuickTest {
@@ -11,11 +16,43 @@ public class QuickTest {
 	 * @param args
 	 */
 	private static short CPU = 0; // % CPU used.
+	private static Connection dbConnection;
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		executePs();
+		try {
+            // Connects to the database named "pi_cloud" on the local server.
+            dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/piCloud" + "?user=piAdmin&password=pi_cloud");
+            System.out.println("Success: Connection to database established.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("FAILURE: Connection to database has failed.");
+            System.exit(1);
+        } 
+		String x = getMostRecentTaskIDs();
 	}
+	
+	public static String getMostRecentTaskIDs() {
+        String eventQry = "SELECT task_id " +
+                             "FROM Task " + // Gets task_id of most recently executed task
+                             "ORDER BY task_id DESC " +
+                             "LIMIT 10";
+        String recentTasks = "recentTasks|2";
+        try {
+            PreparedStatement eventStmt = dbConnection.prepareStatement(eventQry);
+            ResultSet eventRs = eventStmt.executeQuery();
+
+            while (eventRs.next()) {
+            	recentTasks += "|" + eventRs.getDouble("task_id");
+            } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Controller.java: Error executing query to retrieve most recent task events.");
+            System.exit(1);
+        } 
+
+        System.out.println(recentTasks);
+        return recentTasks;
+    } 
 	
 	private static boolean executePs() { // Gets stats on process memory
         String line = "failure";
