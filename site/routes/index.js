@@ -17,7 +17,8 @@ exports.mergeSort_Home = function (req, res) {
 exports.mergeSort_Input = function (req, res) {
         res.render('mergeInput', { title: "Merge Sort - Input", 
                                   stylesheetRef: "/stylesheets/mergeSort.css", 
-                                   gList: globalList
+                                   gList: globalList,
+				   rTasks: recentTasks
                                  });
     };
 

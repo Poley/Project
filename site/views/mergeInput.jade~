@@ -15,7 +15,7 @@ block content
 
     div#eventHistory
         ul(id="history")
-            li(href="/merge_sort/history", name="Task 1") Task 1
+            li(href="/merge_sort/input/", name="Task 1") Task 1
           
     script(type="text/javascript")
         function display(){

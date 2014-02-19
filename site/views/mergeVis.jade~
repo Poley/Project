@@ -4,8 +4,8 @@ block content
   
   div.eventForm
     div#inputDiv
-      p Input: [#{gList}] 
-      p Output: [#{rList}]
+      p#inputList Input: [#{gList}] 
+      p#outputList Output: [#{rList}]
     
     div#eventDiv
       input(type="submit", id="prevEventB", value="Prev").submitButton
@@ -23,8 +23,7 @@ block content
     var eventDictionary = {};
     var currentEvent = 0;
 
-// structure per event: taskid|status|input|output|timestamp|ip|pmem
-    for (i=0; i<splitMessage.length; i=i+7) { 
+    for (i=0; i<splitMessage.length; i=i+7) { // structure per event: taskid|status|input|output|timestamp|ip|pmem
       eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], splitMessage[i+4], splitMessage[i+5], splitMessage[i+6]);
     }
 
@@ -68,6 +67,9 @@ block content
     } ;
 
     function initVisualisation() {
+      var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length-1] ];
+      $("#inputList").text( "Input: " +lastEvent["input"] );
+      $("#outputList").text( "Input: " +lastEvent["input"] );
       var curEvent = eventDictionary[ eventsOrdered[0] ]; 
       var curNode = canvas.select("#node_" + curEvent["ip"]); 
       curNode.select("#input").text( "Input: " +curEvent["input"]);

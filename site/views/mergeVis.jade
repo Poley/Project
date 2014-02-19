@@ -4,8 +4,8 @@ block content
   
   div.eventForm
     div#inputDiv
-      p Input: [#{gList}] 
-      p Output: [#{rList}]
+      p#inputList Input: [#{gList}] 
+      p#outputList Output: [#{rList}]
     
     div#eventDiv
       input(type="submit", id="prevEventB", value="Prev").submitButton
@@ -67,6 +67,9 @@ block content
     } ;
 
     function initVisualisation() {
+      //var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length-1] ];
+      //$("#inputList").text( "Input: " +lastEvent["input"] );
+      //$("#outputList").text( "Input: " +lastEvent["input"] );
       var curEvent = eventDictionary[ eventsOrdered[0] ]; 
       var curNode = canvas.select("#node_" + curEvent["ip"]); 
       curNode.select("#input").text( "Input: " +curEvent["input"]);

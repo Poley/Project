@@ -70,12 +70,14 @@ ws.on('message', function(event) {
                 for (i=2; i<splitMessage.length; i++) {
                     eventString += splitMessage[i] + "|";
                 } 
+		recentTasks.push(splitMessage[3]);
+		var i = recentTasks.shift();
                 console.log( "\n" + eventString);
                 //console.log("Event data received and dictionary created.");
                 //console.log( eventDictionary);
             } else if (splitMessage[0]=="recentTasks" && splitMessage[1]=="2") {
                 for (i=2; i<splitMessage.length; i++) {
-                    recentTasks.push(splitMessage[i] + "|");
+                    recentTasks.push(splitMessage[i]);
                 } 
                 console.log( "\n" + recentTasks);
             } 
@@ -95,6 +97,13 @@ app.get('/merge_sort/input', index.mergeSort_Input);
 app.post('/merge_sort/input', index.mergeSort_Input_postHandler);
 
 app.get('/merge_sort/visualisation', index.mergeSort_Visualisation);
+
+app.get('/merge_sort/visualisation/:task', function(req, res){
+    var sel = req.param('task');
+    console.log("&&&&&&&&&&&&&&&&" + sel);
+    ws.send("previousEventData|1|" + sel);
+    res.redirect('/merge_sort/visualisation');
+});
 
 app.get('/merge_sort/history', index.mergeSort_History);
 

@@ -12,7 +12,7 @@ block content
             var list = document.getElementById('history')
             for (var i =  0 ; i < tasks.length ; ++i){
                 var link = document.createElement('a');
-                link.href = "/merge_sort/visualisation/" + tasks[i];
+                link.href = "/merge_sort/visualisation/?task=" + tasks[i];
                 link.innerHTML = tasks[i];
                 list.appendChild(link);
                 console.log("Added " + tasks[i]);
