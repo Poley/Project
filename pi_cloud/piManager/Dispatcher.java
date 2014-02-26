@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.ResultSet;
 
 /* This class handles the cluster of clients, handling functions such as registration,
     defining and acquiring the network stucture of the cluster. This object is used as a remote object client-side.
@@ -37,11 +42,33 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
 
         try {
             if (clients.length > 0) {
+            	long start = System.currentTimeMillis();
                 clients[0].executeMergeSort(taskID, input); // The first client in the list is always treated as the root.
+                long timeTaken = start - System.currentTimeMillis();
             }
         } catch (Exception e) {
             e.printStackTrace();
         } 
+        
+        String taskCreateStr = "INSERT INTO Task (task_id, type) VALUES ('" + taskID + "', 'MergeSort');";
+        // Connecting to database
+        Connection dbConnection = null;
+        try {
+            // Connects to the database named "pi_cloud" on the local server.
+            dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/piCloud" + "?user=piAdmin&password=pi_cloud");
+            System.out.println("Success: Connection to database established.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("FAILURE: Connection to database has failed.");
+            System.exit(1);
+        } 
+        try {
+            PreparedStatement createTaskStmt = dbConnection.prepareStatement(taskCreateStr);
+            createTaskStmt.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        
+        
    }
 
     public void mergeSortResult(int[] result) throws RemoteException {

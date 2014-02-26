@@ -75,10 +75,10 @@ public class Cluster {
         node.updateTaskDetails(taskId, taskType, taskStatus, input, output); 
         piCluster.put(n, node);
 
-        // Write task update to database (task_id, status, input, output, timestamp, ip, pMem)
+        // Write task update to database (task_id, status, input, output, timestamp, ip, pMem, cpuUsage)
         // Adds a new 'Event' to the database.
         try {
-            PreparedStatement addEvent = dbConnection.prepareStatement("INSERT INTO Event VALUES (?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement addEvent = dbConnection.prepareStatement("INSERT INTO Event VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             addEvent.setLong(1, node.getTaskId());
             addEvent.setString(2, node.getTaskStatus() );
             addEvent.setString(3, input); // node input
@@ -86,6 +86,7 @@ public class Cluster {
             addEvent.setLong(5, System.currentTimeMillis()); // give timestamp
             addEvent.setString(6, node.getHost() ); // ip
             addEvent.setLong(7, node.getPMem() );  // process memory
+            addEvent.setLong(8, node.getCPUUsage() );  // cpu usage
 
             int res = addEvent.executeUpdate();
 

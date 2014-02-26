@@ -151,6 +151,7 @@ public class Controller {
     			eventsMessage += eventRs.getLong("timestamp") + "|";
     			eventsMessage += eventRs.getString("ip") + "|";
     			eventsMessage += eventRs.getShort("percentageMemory");
+    			eventsMessage += eventRs.getShort("cpuUsage");
     		} 
     	} catch (SQLException e) {
     		e.printStackTrace();
@@ -180,6 +181,7 @@ public class Controller {
                 eventsMessage += eventRs.getLong("timestamp") + "|";
                 eventsMessage += eventRs.getString("ip") + "|";
                 eventsMessage += eventRs.getShort("percentageMemory");
+    			eventsMessage += eventRs.getShort("cpuUsage");
             } 
         } catch (SQLException e) {
             e.printStackTrace();

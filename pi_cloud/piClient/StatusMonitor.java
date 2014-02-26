@@ -141,16 +141,16 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
                 switch (i) {
                     //case 7: DRS = Integer.parseInt(res[i]); //System.out.println("Initial DRS: " + DRS);
                             //continue;
-                    //case 8: RSS = Integer.parseInt(res[i]);
+                    case 2: cpuUsage = (short) Float.parseFloat(res[i]);
                             //continue;
-                    case 2: PMEM = (short) Float.parseFloat(res[i]);
+                    case 3: PMEM = (short) Float.parseFloat(res[i]);
                             continue;
                     default: continue;
                 }
             } 
 
             System.out.println("DRS: " + DRS);
-            System.out.println("RSS: " + RSS);
+            System.out.println("%CPU: " + cpuUsage);
             System.out.println("%MEM:" + PMEM);
         } catch (Exception e) {
             System.out.println("FAILURE: StatusMonitor.java: Error executing \"ps\" and acquiring DRS, RSS and %MEM");

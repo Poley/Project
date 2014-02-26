@@ -61,6 +61,7 @@ public class Pi {
     protected String getTaskType() { return taskType; } 
     protected String getTaskStatus() { return taskStatus; }
     protected short getPMem() { return PMEM; };
+    protected short getCPUUsage() { return cpuUsage; };
 
     protected void printResourceStats() {
         System.out.println("\tDRS: " + DRS + " kb");
