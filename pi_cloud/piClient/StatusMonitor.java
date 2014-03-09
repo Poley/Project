@@ -125,7 +125,7 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
     private boolean executePs() { // Gets stats on process memory
         String line = "failure";
         String res[] = new String[11]; 
-        String[] cmd = {"/bin/sh", "-c", "ps aux | grep java"}; // need the first two strings (running from shell) so that the pipe can be used, doesn't work otherwise.
+        String[] cmd = {"/bin/sh", "-c", "ps aux | grep piClient"}; // need the first two strings (running from shell) so that the pipe can be used, doesn't work otherwise.
 
         try {
             Process pr = Runtime.getRuntime().exec(cmd);

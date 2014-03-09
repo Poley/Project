@@ -39,27 +39,38 @@ public class Dispatcher extends UnicastRemoteObject implements Dispatcher_Intf {
 
     protected void executeMergeSort(long taskID, Client_Intf[] clients, int[] input) {
         int[] sorted = new int[input.length];
+        String inputString = "[ " + input[0];
+        
+        for (int i=1; i<input.length ; i++){
+        	inputString += ", " + input[i];
+        }
+        
+        inputString += " ]";
+        
+        long timeTaken =0;
 
         try {
             if (clients.length > 0) {
             	long start = System.currentTimeMillis();
                 clients[0].executeMergeSort(taskID, input); // The first client in the list is always treated as the root.
-                long timeTaken = start - System.currentTimeMillis();
+                timeTaken = System.currentTimeMillis() - start;
             }
         } catch (Exception e) {
             e.printStackTrace();
         } 
         
-        String taskCreateStr = "INSERT INTO Task (task_id, type) VALUES ('" + taskID + "', 'MergeSort');";
+        String taskCreateStr = "UPDATE Task SET timetaken = " + timeTaken + ", input = '" + inputString + "' WHERE task_id = " + taskID;
         // Connecting to database
         Connection dbConnection = null;
         try {
             // Connects to the database named "pi_cloud" on the local server.
             dbConnection = DriverManager.getConnection("jdbc:mysql://localhost/piCloud" + "?user=piAdmin&password=pi_cloud");
             System.out.println("Success: Connection to database established.");
+            PreparedStatement taskStmt = dbConnection.prepareStatement(taskCreateStr);
+            taskStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("FAILURE: Connection to database has failed.");
+            System.out.println("FAILURE: SQLException");
             System.exit(1);
         } 
         try {

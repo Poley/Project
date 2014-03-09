@@ -33,11 +33,10 @@ if ('development' == app.get('env')) {
 
 // Global list manipulated by web app.
 globalList = [1,2,3,4,5,4,3,2,1];
-resultList = [0];
 recentTasks = []; //id of recent tasks
 eventDictionary = {}; // dictionary containing all events occured during an algorithm. Key:value = timestamp:eventObj .
+taskDetails = {}; // ID, type, input, ouput and time taken for task
 eventString = "";
-eventsOrdered = []; // ordered list of events occuring within one task execution, used for web app to iterate across events in order.
 visReady = false; // used to indicate when the visualisation has all information it requires e.g. result & event data.
 
 // Establishing connection to back-end Pi Manager.
@@ -58,8 +57,7 @@ ws.on('message', function(event) {
             if (splitMessage[0]=="mergesort") { // "mergesort|optcode|distributed/single|tte|resultList"
                 if (splitMessage[1]=="2") { // merge sort response
                     // skip checking single / distributed
-                    var tte = splitMessage[3]
-                    resultList = splitMessage[4];
+                    var tte = splitMessage[3];
                     ws.send("eventData|1"); // Requests the Pi Server sends information on events during the merge sort execution
                 } 
             } else if (splitMessage[0]=="getClusterNetwork" && splitMessage[1]=="2"){
@@ -99,7 +97,7 @@ app.post('/merge_sort/input', index.mergeSort_Input_postHandler);
 app.get('/merge_sort/visualisation', index.mergeSort_Visualisation);
 
 app.get('/merge_sort/visualisation/:task', function(req, res){
-    var sel = req.param('task');
+    var sel = req.params.task;
     console.log("&&&&&&&&&&&&&&&&" + sel);
     ws.send("previousEventData|1|" + sel);
     res.redirect('/merge_sort/visualisation');

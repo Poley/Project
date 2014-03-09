@@ -4,8 +4,9 @@ block content
   
   div.eventForm
     div#inputDiv
-      p#inputList Input: [#{gList}] 
-      p#outputList Output: [#{rList}]
+      p#inputList Input:  
+      p#outputList Output: 
+      p#timeTaken Time: 
     
     div#eventDiv
       input(type="submit", id="prevEventB", value="Prev").submitButton
@@ -22,9 +23,16 @@ block content
     var splitMessage = "!{events}".split("|"); 
     var eventDictionary = {};
     var currentEvent = 0;
+    var eventsOrdered = []; // ordered list of events occuring within one task execution, used for web app to iterate across events in order.
+    var taskDetails = {}; // structure: taskid|type|input|output|time
 
-    for (i=0; i<splitMessage.length; i=i+7) { // structure per event: taskid|status|input|output|timestamp|ip|pmem
-      eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], splitMessage[i+4], splitMessage[i+5], splitMessage[i+6]);
+    taskDetails = taskObj(splitMessage[0],splitMessage[1],splitMessage[2],splitMessage[3],splitMessage[4])
+    
+
+    for (i=5; i<splitMessage.length; i=i+7) { // structure per event: taskid|status|input|output|timestamp|ip|pmem
+
+      eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], splitMessage[i+4], splitMessage[i+5], splitMessage[i+6], splitMessage[i+7]);
+      console.log("Event: " + eventDictionary[splitMessage[i+4]].cpu);
     }
 
     var keys = Object.keys( eventDictionary);
@@ -32,7 +40,17 @@ block content
     updateEventPanel();
     initVisualisation();
     
-    function eventObj(taskid, taskStatus, inp,out, timestamp, ipAddr, pm) {
+    function taskObj(taskid, type, inp, out, time) {
+      taskO = {};
+      taskO.task_id = taskid;
+      taskO.type = type;
+      taskO.input = inp;
+      taskO.output = out;
+      taskO.time = time;
+      return taskO;
+    }
+
+    function eventObj(taskid, taskStatus, inp,out, timestamp, ipAddr, pm, cpu) {
       eventO = {};
       eventO.task_id = taskid;
       eventO.tStatus = taskStatus;
@@ -41,6 +59,7 @@ block content
       eventO.tStamp = timestamp;
       eventO.ip = ipAddr;
       eventO.pmem = pm;
+      eventO.cpu = cpu;
       return eventO;
     }
 
@@ -67,15 +86,16 @@ block content
     } ;
 
     function initVisualisation() {
-      //var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length-1] ];
-      //$("#inputList").text( "Input: " +lastEvent["input"] );
-      //$("#outputList").text( "Input: " +lastEvent["input"] );
+      //var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length] ];
+      $("#inputList").text( "Input: " +taskDetails["input"] );
+      $("#outputList").text( "Output: " +taskDetails["output"] );
+      $("#timeTaken").text( "Time: " +taskDetails["time"] + " ms" );
       var curEvent = eventDictionary[ eventsOrdered[0] ]; 
       var curNode = canvas.select("#node_" + curEvent["ip"]); 
       curNode.select("#input").text( "Input: " +curEvent["input"]);
       curNode.select("#output").text( "Output: " +curEvent["output"]);
       curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
-      curNode.select("#cpu").text( "CPU Usage: " +curEvent["pmem"]);
+      curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
     } 
 
     function updateVisualisation() {
@@ -92,5 +112,5 @@ block content
       curNode.select("#input").text( "Input: " +curEvent["input"]);
       curNode.select("#output").text( "Output: " +curEvent["output"]);
       curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
-      curNode.select("#cpu").text( "CPU Usage: " +curEvent["pmem"]);
+      curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
     } 

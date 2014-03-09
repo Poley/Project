@@ -62,9 +62,6 @@ exports.mergeSort_Visualisation = function (req, res) {
         res.render('mergeVis', { title: "Merge Sort - Visualisation",
                                   stylesheetRef: "/stylesheets/mergeSort.css",
                                   scripts: ["/javascripts/libraries/d3.v3.min.js", "/javascripts/visualisation/visualisation.js", "/javascripts/visualisation/visPage.js"],
-                                  gList: globalList,
-                                  rList: resultList,
-                                  events: eventString,
-                                  eventsOrdered: eventsOrdered
+                                  events: eventString			
                                   } );
     }; 

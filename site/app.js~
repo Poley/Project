@@ -36,6 +36,7 @@ globalList = [1,2,3,4,5,4,3,2,1];
 resultList = [0];
 recentTasks = []; //id of recent tasks
 eventDictionary = {}; // dictionary containing all events occured during an algorithm. Key:value = timestamp:eventObj .
+taskDetails = {}; // ID, type, input, ouput and time taken for task
 eventString = "";
 eventsOrdered = []; // ordered list of events occuring within one task execution, used for web app to iterate across events in order.
 visReady = false; // used to indicate when the visualisation has all information it requires e.g. result & event data.
@@ -70,7 +71,7 @@ ws.on('message', function(event) {
                 for (i=2; i<splitMessage.length; i++) {
                     eventString += splitMessage[i] + "|";
                 } 
-		recentTasks.push(splitMessage[3]);
+		recentTasks.push(splitMessage[2]);
 		var i = recentTasks.shift();
                 console.log( "\n" + eventString);
                 //console.log("Event data received and dictionary created.");
@@ -99,7 +100,7 @@ app.post('/merge_sort/input', index.mergeSort_Input_postHandler);
 app.get('/merge_sort/visualisation', index.mergeSort_Visualisation);
 
 app.get('/merge_sort/visualisation/:task', function(req, res){
-    var sel = req.param('task');
+    var sel = req.params.task;
     console.log("&&&&&&&&&&&&&&&&" + sel);
     ws.send("previousEventData|1|" + sel);
     res.redirect('/merge_sort/visualisation');
