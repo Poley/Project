@@ -133,14 +133,29 @@ public class Controller {
     
     // Retrieves the set of events that have occurred in a specific task.
     public String getPreviousTaskEvents(String id){
+    	double taskID = Double.parseDouble(id);
     	
     	String eventQry = "SELECT * FROM Event e " +
     			"INNER JOIN ( SELECT task_id AS ti FROM Task WHERE task_id = ?) m " + // ? is the task id passed as a parameter
     			"ON e.task_id = m.ti";
+    	
+    	String taskQry = "SELECT * FROM Task " +
+                "WHERE task_id = " + taskID;
     	String eventsMessage = "eventData|2";
     	try {
+        	PreparedStatement taskStmt = dbConnection.prepareStatement(taskQry);
+            ResultSet taskRs = taskStmt.executeQuery();
+            
+            while (taskRs.next()){
+            	eventsMessage += "|" + taskRs.getDouble("task_id") + "|";
+            	eventsMessage += taskRs.getString("type") + "|";
+                eventsMessage += taskRs.getString("input") + "|";
+                eventsMessage += taskRs.getString("output") + "|";
+                eventsMessage += taskRs.getLong("timetaken");
+            }
+            
     		PreparedStatement eventStmt = dbConnection.prepareStatement(eventQry);
-    		eventStmt.setString(1,  id);
+    		eventStmt.setDouble(1,  taskID);
     		ResultSet eventRs = eventStmt.executeQuery();
 
     		while (eventRs.next()) {
@@ -150,7 +165,7 @@ public class Controller {
     			eventsMessage += eventRs.getString("output") + "|";
     			eventsMessage += eventRs.getLong("timestamp") + "|";
     			eventsMessage += eventRs.getString("ip") + "|";
-    			eventsMessage += eventRs.getShort("percentageMemory");
+    			eventsMessage += eventRs.getShort("percentageMemory") + "|";
     			eventsMessage += eventRs.getShort("cpuUsage");
     		} 
     	} catch (SQLException e) {
@@ -181,14 +196,14 @@ public class Controller {
             	eventsMessage += taskRs.getString("type") + "|";
                 eventsMessage += taskRs.getString("input") + "|";
                 eventsMessage += taskRs.getString("output") + "|";
-                eventsMessage += taskRs.getLong("timetaken") + "|";
+                eventsMessage += taskRs.getLong("timetaken");
             }
             
             PreparedStatement eventStmt = dbConnection.prepareStatement(eventQry);
             ResultSet eventRs = eventStmt.executeQuery();
 
             while (eventRs.next()) {
-                eventsMessage += eventRs.getDouble("task_id") + "|";
+                eventsMessage += "|"+ eventRs.getDouble("task_id") + "|";
                 eventsMessage += eventRs.getString("status") + "|";
                 eventsMessage += eventRs.getString("input") + "|";
                 eventsMessage += eventRs.getString("output") + "|";

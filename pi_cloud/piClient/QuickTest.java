@@ -19,15 +19,9 @@ public class QuickTest {
 	private static Connection dbConnection;
 	
 	public static void main(String[] args) {
-		int data[] = new int[] {10,20,30,40,50,60,71,80,90,91 };
-		  String inputString = "[ " + data[0];
-	        
-	        for (int i=1; i<data.length ; i++){
-	        	inputString += ", " + data[i];
-	        }
-	        
-	        inputString += " ]";
-		System.out.println(inputString);
+		String x = "1.394419502486E12";
+		double y = Double.parseDouble(x);
+		System.out.println(y);
 	}
 	
 	public static String getMostRecentTaskIDs() {

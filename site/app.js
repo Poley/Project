@@ -65,11 +65,12 @@ ws.on('message', function(event) {
                 var treeJsonText = splitMessage[2];
                 fs.writeFileSync("./public/javascripts/visualisation/tree.json", splitMessage[2]);
             } else if (splitMessage[0]=="eventData" && splitMessage[1]=="2") {
+                eventString = "";
                 for (i=2; i<splitMessage.length; i++) {
                     eventString += splitMessage[i] + "|";
                 } 
-		recentTasks.push(splitMessage[2]);
-		var i = recentTasks.shift();
+		//recentTasks.push(splitMessage[2]);
+		//var i = recentTasks.shift();
                 console.log( "\n" + eventString);
                 //console.log("Event data received and dictionary created.");
                 //console.log( eventDictionary);

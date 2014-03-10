@@ -29,7 +29,7 @@ block content
     taskDetails = taskObj(splitMessage[0],splitMessage[1],splitMessage[2],splitMessage[3],splitMessage[4])
     
 
-    for (i=5; i<splitMessage.length; i=i+7) { // structure per event: taskid|status|input|output|timestamp|ip|pmem
+    for (i=5; i<splitMessage.length; i=i+8) { // structure per event: taskid|status|input|output|timestamp|ip|pmem|cpu
 
       eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], splitMessage[i+4], splitMessage[i+5], splitMessage[i+6], splitMessage[i+7]);
       console.log("Event: " + eventDictionary[splitMessage[i+4]].cpu);
@@ -113,4 +113,7 @@ block content
       curNode.select("#output").text( "Output: " +curEvent["output"]);
       curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
       curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
+      //if (curEvent["cpu"]>0){
+        curNode.select("#circle").style( "fill", function(d){return d._children ? "#000" : "#fff"});
+      //}
     } 

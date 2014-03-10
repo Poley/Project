@@ -80,6 +80,7 @@ function update (source) {
         .on("click", click);
 
     nodeEnter.append("circle").attr("class", "circle") 
+        .attr("id", "circleCol")
         .attr("r", 1e-6)
         .style("fill", function(d) { return d.children ? "lightsteelblue" : "#fff"; });
     
