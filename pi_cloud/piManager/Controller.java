@@ -6,12 +6,15 @@ import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
 import java.net.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,7 +23,6 @@ import java.sql.PreparedStatement;
 import java.io.*; // may not need this
 
 import org.java_websocket.server.*;
-import org.java_websocket.server.DefaultWebSocketServerFactory;
 
 /* This class co-ordinates communcation between the web server and all clients.
    It sets up the database, RMI objects and web socket communcation. 
@@ -116,14 +118,18 @@ public class Controller {
         dispatch.defineClusterNetwork( cluster.getClients() , mergeSortInput.length ); // define each nodes children.
 
         // Create Task in database
-        long taskID = System.currentTimeMillis();
-        String taskCreateStr = "INSERT INTO Task (task_id, type) VALUES ('" + taskID + "', 'MergeSort');";
+        DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+		long taskID = System.currentTimeMillis();
+		Date x = new Date(taskID);
+		String y = df.format(x);
+		long timeID = Long.parseLong(y);
+        String taskCreateStr = "INSERT INTO Task (task_id, type) VALUES ('" + timeID + "', 'MergeSort');";
         try {
             PreparedStatement createTaskStmt = dbConnection.prepareStatement(taskCreateStr);
             createTaskStmt.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
 
-        dispatch.executeMergeSort(taskID, cluster.getClients(), mergeSortInput); 
+        dispatch.executeMergeSort(timeID, cluster.getClients(), mergeSortInput); 
     } 
 
     // Called when a merge sort's result has been acquired.

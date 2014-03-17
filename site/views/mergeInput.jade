@@ -1,33 +1,38 @@
 extends layout
 
 block content
-    h1#headerTwo Input Page ( input = [#{gList}] )
-    
-    div#inputList
-        form(name="inputForm", method="post").configForm
-          div
-            label(for="inputText") Please input the values you wish to be entered to the input list (separated by a space).
-          div
-            textarea(type=number, name="updatedList", value="12 3 45")
-          div
-            input(type="submit", name="randomListButton", value="Create Random List")
-            input(type="submit", name="submitButton", value="Execute Merge Sort")
+    body
+            div.navbar.navbar-default.navbar-static-top
+                div.container
+                    a(href='#').navbar-brand Raspberry Pi Cloud Tool
 
-    div#eventHistory
-        ul(id="history")
-            li(href="/merge_sort/history", name="Task 1") Task 1
-          
-    script(type="text/javascript")
-        function display(){
-            var tasks = "!{rTasks}".split(",");
-            var list = document.getElementById('history')
-            for (var i =  0 ; i < tasks.length ; ++i){
-                var li = document.createElement('li');
-                li.href = "/merge_sort/input/";
-                li.innerHTML = tasks[i];
-                list.appendChild(li);
-                console.log("Added " + tasks[i]);
-            }
-        }
-      
-        display();
+                    button(data-toggle = "collapse", data-target = ".navHeaderCollapse").navbar-toggle 
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
+
+                    div.collapse.navbar-collapse.navHeaderCollapse
+                        ul.nav.navbar-nav.navbar-right
+                            li 
+                                a(href="/") Home
+                            li.active
+                                a(href="/merge_sort/input") Input
+                            li
+                                a(href="/merge_sort/history") History
+                            li
+                                a(href="#about", data-toggle="modal") About
+
+            div.container
+                div.row
+                    div(id="input").panel.panel-default
+                        div.panel-heading Input Page
+                        div.panel-body
+                            h1 Current input: [#{gList}]
+                            form(name="inputForm", method="post")
+                                div
+                                    label(for="inputText") Please input the values you wish to be entered to the input list (separated by a space)
+                                div
+                                    textarea(type=number, name="updatedList", value="12 3 45")
+                                div
+                                    button(type="submit", name="randomListButton").btn.btn-default Create Random List
+                                    button(type="submit", name="submitButton").btn.btn-default Execute Merge Sort

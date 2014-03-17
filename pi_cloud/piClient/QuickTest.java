@@ -4,10 +4,13 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 
 public class QuickTest {
@@ -19,9 +22,12 @@ public class QuickTest {
 	private static Connection dbConnection;
 	
 	public static void main(String[] args) {
-		String x = "1.394419502486E12";
-		double y = Double.parseDouble(x);
-		System.out.println(y);
+		DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+		long taskID = System.currentTimeMillis();
+		Date x = new Date(taskID);
+		String y = df.format(x);
+		long timeID = Long.parseLong(y);
+		System.out.println(timeID);
 	}
 	
 	public static String getMostRecentTaskIDs() {

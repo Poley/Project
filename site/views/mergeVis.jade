@@ -1,119 +1,141 @@
 extends layout
 
 block content
-  
-  div.eventForm
-    div#inputDiv
-      p#inputList Input:  
-      p#outputList Output: 
-      p#timeTaken Time: 
-    
-    div#eventDiv
-      input(type="submit", id="prevEventB", value="Prev").submitButton
-      a#eventPanel Event /n
-      input(type="submit", id="nextEventB", value="Next").submitButton
-
-    //p#eventData bla bla bla 
-  
-  -each script in scripts
-    script(type="text/javascript", src=script);
+    body
+        div.navbar.navbar-default.navbar-static-top
+            div.container
+                a(href='#').navbar-brand Raspberry Pi Cloud Tool
+                
+                button(data-toggle = "collapse", data-target = ".navHeaderCollapse").navbar-toggle 
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+                
+                div.collapse.navbar-collapse.navHeaderCollapse
+                    ul.nav.navbar-nav.navbar-right
+                        li 
+                            a(href="/") Home
+                        li
+                            a(href="/merge_sort/input") Input
+                        li
+                            a(href="/merge_sort/history") History
+                        li
+                            a(href="#about", data-toggle="modal") About
+                            
+        div.container
+            div#center.panel.panel-default
+                div.container
+                    div.row
+                        div.col-lg-10
+                            div.panel-body
+                                p#inputList Input:
+                                p#outputList Output:
+                                p#timeTaken Time Taken:
+                    div.row
+                        div#eventCounter
+                            button(type="submit", id="prevEventB").btn.btn-default Prev
+                            a#eventPanel Event /n
+                            button(type="submit", id="nextEventB").btn.btn-default Next 
+              
+        -each script in scripts
+          script(type="text/javascript", src=script);
  
 
-  script(type="text/javascript")
-    var splitMessage = "!{events}".split("|"); 
-    var eventDictionary = {};
-    var currentEvent = 0;
-    var eventsOrdered = []; // ordered list of events occuring within one task execution, used for web app to iterate across events in order.
-    var taskDetails = {}; // structure: taskid|type|input|output|time
+          script(type="text/javascript")
+            var splitMessage = "!{events}".split("|"); 
+            var eventDictionary = {};
+            var currentEvent = 0;
+            var eventsOrdered = []; // ordered list of events occuring within one task execution, used for web app to iterate across events in order.
+            var taskDetails = {}; // structure: taskid|type|input|output|time
 
-    taskDetails = taskObj(splitMessage[0],splitMessage[1],splitMessage[2],splitMessage[3],splitMessage[4])
-    
+            taskDetails = taskObj(splitMessage[0],splitMessage[1],splitMessage[2],splitMessage[3],splitMessage[4])
 
-    for (i=5; i<splitMessage.length; i=i+8) { // structure per event: taskid|status|input|output|timestamp|ip|pmem|cpu
 
-      eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], splitMessage[i+4], splitMessage[i+5], splitMessage[i+6], splitMessage[i+7]);
-      console.log("Event: " + eventDictionary[splitMessage[i+4]].cpu);
-    }
+            for (i=5; i<splitMessage.length; i=i+8) { // structure per event: taskid|status|input|output|timestamp|ip|pmem|cpu
 
-    var keys = Object.keys( eventDictionary);
-    var eventsOrdered = keys.sort() ;
-    updateEventPanel();
-    initVisualisation();
-    
-    function taskObj(taskid, type, inp, out, time) {
-      taskO = {};
-      taskO.task_id = taskid;
-      taskO.type = type;
-      taskO.input = inp;
-      taskO.output = out;
-      taskO.time = time;
-      return taskO;
-    }
+              eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], splitMessage[i+4], splitMessage[i+5], splitMessage[i+6], splitMessage[i+7]);
+              console.log("Event: " + eventDictionary[splitMessage[i+4]].cpu);
+            }
 
-    function eventObj(taskid, taskStatus, inp,out, timestamp, ipAddr, pm, cpu) {
-      eventO = {};
-      eventO.task_id = taskid;
-      eventO.tStatus = taskStatus;
-      eventO.input = inp;
-      eventO.output = out;
-      eventO.tStamp = timestamp;
-      eventO.ip = ipAddr;
-      eventO.pmem = pm;
-      eventO.cpu = cpu;
-      return eventO;
-    }
+            var keys = Object.keys( eventDictionary);
+            var eventsOrdered = keys.sort() ;
+            updateEventPanel();
+            initVisualisation();
 
-    $("#prevEventB").click( function() { 
-      console.log("Previous");
-      if (currentEvent>0) {
-        currentEvent--;
-        updateEventPanel();
-        updateVisualisation();
-      } 
-    } );
+            function taskObj(taskid, type, inp, out, time) {
+              taskO = {};
+              taskO.task_id = taskid;
+              taskO.type = type;
+              taskO.input = inp;
+              taskO.output = out;
+              taskO.time = time;
+              return taskO;
+            }
 
-    $("#nextEventB").click( function() {
-      console.log("Next");
-      if (currentEvent < (eventsOrdered.length-2) ) {
-        currentEvent++;
-        updateEventPanel();
-        updateVisualisation();
-      } 
-    } ); 
-    
-    function updateEventPanel( curEvent, totalEvents) {
-      $("#eventPanel").text( (currentEvent+1) + "/" + (eventsOrdered.length-1) );  
-    } ;
+            function eventObj(taskid, taskStatus, inp,out, timestamp, ipAddr, pm, cpu) {
+              eventO = {};
+              eventO.task_id = taskid;
+              eventO.tStatus = taskStatus;
+              eventO.input = inp;
+              eventO.output = out;
+              eventO.tStamp = timestamp;
+              eventO.ip = ipAddr;
+              eventO.pmem = pm;
+              eventO.cpu = cpu;
+              return eventO;
+            }
 
-    function initVisualisation() {
-      //var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length] ];
-      $("#inputList").text( "Input: " +taskDetails["input"] );
-      $("#outputList").text( "Output: " +taskDetails["output"] );
-      $("#timeTaken").text( "Time: " +taskDetails["time"] + " ms" );
-      var curEvent = eventDictionary[ eventsOrdered[0] ]; 
-      var curNode = canvas.select("#node_" + curEvent["ip"]); 
-      curNode.select("#input").text( "Input: " +curEvent["input"]);
-      curNode.select("#output").text( "Output: " +curEvent["output"]);
-      curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
-      curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
-    } 
+            $("#prevEventB").unbind("click").click( function() { 
+              console.log("Previous");
+              if (currentEvent>0) {
+                currentEvent--;
+                updateEventPanel();
+                updateVisualisation();
+              } 
+            } );
 
-    function updateVisualisation() {
-      var curEvent = eventDictionary[ eventsOrdered[currentEvent] ]; 
-      
-      
-      $("#eventData").text( "Input:" + curEvent["input"] + 
-                            " Task status: " + curEvent["tStatus"] + 
-                            " Output: " + curEvent["output"] +
-                            " IP: " + curEvent["ip"] + " CPU Usage: " + curEvent["pmem"]);
-      
-      console.log("ip" + curEvent["ip"]);
-      var curNode = canvas.select("#node_" + curEvent["ip"]); 
-      curNode.select("#input").text( "Input: " +curEvent["input"]);
-      curNode.select("#output").text( "Output: " +curEvent["output"]);
-      curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
-      curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
-      //if (curEvent["cpu"]>0){
-        curNode.select("#circle").style( "fill", function(d){return d._children ? "#000" : "#fff"});
-      //}
-    } 
+            $("#nextEventB").unbind("click").click( function() {
+              console.log("Next");
+              if (currentEvent < (eventsOrdered.length-2) ) {
+                currentEvent++;
+                updateEventPanel();
+                updateVisualisation();
+              } 
+            } ); 
+
+            function updateEventPanel( curEvent, totalEvents) {
+              $("#eventPanel").text( (currentEvent+1) + "/" + (eventsOrdered.length-1) );  
+            } ;
+
+            function initVisualisation() {
+              var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length] ];
+              $("#inputList").text( "Input: " +taskDetails["input"] );
+              $("#outputList").text( "Output: " +lastEvent["output"] );
+              $("#timeTaken").text( "Time: " +taskDetails["time"] + " ms" );
+              var curEvent = eventDictionary[ eventsOrdered[0] ]; 
+              var curNode = canvas.select("#node_" + curEvent["ip"]); 
+              curNode.select("#input").text( "Input: " +curEvent["input"]);
+              curNode.select("#output").text( "Output: " +curEvent["output"]);
+              curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
+              curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
+            } 
+
+            function updateVisualisation() {
+              var curEvent = eventDictionary[ eventsOrdered[currentEvent] ]; 
+
+
+              $("#eventData").text( "Input:" + curEvent["input"] + 
+                                    " Task status: " + curEvent["tStatus"] + 
+                                    " Output: " + curEvent["output"] +
+                                    " IP: " + curEvent["ip"] + " CPU Usage: " + curEvent["pmem"]);
+
+              console.log("ip" + curEvent["ip"]);
+              var curNode = canvas.select("#node_" + curEvent["ip"]); 
+              curNode.select("#input").text( "Input: " +curEvent["input"]);
+              curNode.select("#output").text( "Output: " +curEvent["output"]);
+              curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
+              curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
+              //if (curEvent["cpu"]>0){
+                curNode.select("#circle").style( "fill", function(d){return d._children ? "#000" : "#fff"});
+              //}
+            } 

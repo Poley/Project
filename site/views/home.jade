@@ -1,14 +1,54 @@
 extends layout
 
 block content
-  div#header.header
-    h1 #{title}
-    p About this
-  
-  nav#navContainer
-    div.listContainer
-      h2 Available Algorithms:
-      ul
-        li 
-          a(href="/merge_sort/input").navItem Merge Sort
-
+    body
+        div.navbar.navbar-default.navbar-static-top
+            div.container
+                a(href='#').navbar-brand Raspberry Pi Cloud Tool
+                
+                button(data-toggle = "collapse", data-target = ".navHeaderCollapse").navbar-toggle 
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+                
+                div.collapse.navbar-collapse.navHeaderCollapse
+                    ul.nav.navbar-nav.navbar-right
+                        li.active 
+                            a(href="/") Home
+                        li
+                            a(href="/merge_sort/input") Input
+                        li
+                            a(href="/merge_sort/history") History
+                        li
+                            a(href="#about", data-toggle="modal") About
+                            
+        div.container
+            div.jumbotron
+                h1 Raspberry Pi Cloud Educational Tool  
+                p Helping to develop your understanding of the raspberry pi cloud
+                p
+                    a(href = "#about").btn.btn-primary.btn-large Learn more
+                    
+            div.row
+                div.col-lg-6
+                    div.panel.panel-default
+                        div.panel-heading Available Algorithms
+                        div.panel-body
+                            h2
+                                a(href="/merge_sort/input") Mergesort
+                div.col-lg-6
+                    div.panel.panel-default
+                        div.panel-heading History
+                        div.panel-body
+                            h2
+                                a(href="/merge_sort/input") Task 1
+                                
+    div(id = "about", role = "dialog").modal fade
+        div.modal-dialog
+            div.modal-content
+                div.modal-header
+                    h4 Raspberry Pi Cloud Tool
+                div.modal-body
+                    p More info
+                div.modal-footer
+                    a(data-dismiss="modal").btn.btn-primary Close

@@ -1,5 +1,5 @@
 body {
-  background-color: #ffeda7;
+  background-color: #FFF;
   font-size: 16px;
   margin: 0;
   padding: 0;
@@ -65,7 +65,7 @@ body {
   color: #667f6d;
 }
 #center {
-  background-color: #eec;
+  background-color: #FFF;
   min-height: 550px;
 /* for modern browsers */
   height: 100% !important;
@@ -76,10 +76,6 @@ body {
   padding-top: 0.5em;
   padding-left: 0.5em;
   padding-right: 0.8em;
-  -webkit-border-bottom-left-radius: inherit;
-  -webkit-border-bottom-right-radius: inherit;
-  -moz-border-bottom-left-radius: inherit;
-  -moz-border-bottom-right-radius: inherit;
 }
 #footer {
   position: relative;
@@ -134,10 +130,18 @@ body {
   margin-right: 0.5em;
   width: 14em;
 }
-.configForm textarea {
+button {
+  margin-bottom: 0.3em;
+}
+#eventCounter{
+  float: right;
+  height: 2.2em;
+  font-size: 20px;
+}
+textarea {
   margin-top: 0.5em;
   height: 13em;
-  width: 52em;
+  width: 26em;
   resize: none;
 }
 .eventForm {

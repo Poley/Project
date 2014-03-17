@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+        <head>
+                <title>Raspberry Pi Cloud</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link href = "bootstrap.css" rel = "stylesheet">
+                <link href = "css/styles.css" rel = "stylesheet">
+        </head>
+        <body>
+ 
+                <div class = "navbar navbar-default navbar-static-top">
+                        <div class = "container">
+                               
+                                <a href = "#" class = "navbar-brand">Raspberry Pi Cloud</a>
+                               
+                                <button class = "navbar-toggle" data-toggle = "collapse" data-target = ".navHeaderCollapse">
+                                        <span class = "icon-bar"></span>
+                                        <span class = "icon-bar"></span>
+                                        <span class = "icon-bar"></span>
+                                </button>
+                               
+                                <div class = "collapse navbar-collapse navHeaderCollapse">
+                               
+                                        <ul class = "nav navbar-nav navbar-right">
+                                       
+                                                <li><a href = "index.html">Home</a></li>
+                                                <li><a href = "mergeInput.html">Input</a></li>
+						<li class = "active"><a href = "mergeVis.html">Visualisation</a></li>
+                                                <li><a href = "#about" data-toggle="modal">About</a></li>
+                                       
+                                        </ul>
+                               
+                                </div>
+                               
+                        </div>
+                </div>
+            <div class="container">
+                <div class="row">
+                        <div class="panel panel-default" id="inputDiv"> 
+                            <div class="panel-body">
+                                <p id="inputList">Input: </p>
+				<p id="outputList">Output: </p>
+				<p id="timeTaken">Time Taken: </p>
+                            </div>
+                        </div>
+                </div>
+		<div class="row" id="centre">
+			
+		</div>
+            </div>
+		
+
+			<div class = "modal fade" id = "about" role = "dialog">
+                    <div class = "modal-dialog">
+                        <div class = "modal-content">
+                            <div class = "modal-header">
+                                <h4>Raspberry Pi Cloud Tool</h4>
+                            </div>
+                            <div class = "modal-body">
+                                <p>More info</p>
+                            </div>
+                            <div class = "modal-footer">  
+                                <a class = "btn btn-primary" data-dismiss = "modal">Close</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+  -each script in scripts
+    script(type="text/javascript", src=script);
+ 
+
+  script(type="text/javascript")
+    var splitMessage = "!{events}".split("|"); 
+    var eventDictionary = {};
+    var currentEvent = 0;
+    var eventsOrdered = []; // ordered list of events occuring within one task execution, used for web app to iterate across events in order.
+    var taskDetails = {}; // structure: taskid|type|input|output|time
+
+    taskDetails = taskObj(splitMessage[0],splitMessage[1],splitMessage[2],splitMessage[3],splitMessage[4])
+    
+
+    for (i=5; i<splitMessage.length; i=i+8) { // structure per event: taskid|status|input|output|timestamp|ip|pmem|cpu
+
+      eventDictionary[ splitMessage[i+4] ] = eventObj(splitMessage[i], splitMessage[i+1], splitMessage[i+2], splitMessage[i+3], splitMessage[i+4], splitMessage[i+5], splitMessage[i+6], splitMessage[i+7]);
+      console.log("Event: " + eventDictionary[splitMessage[i+4]].cpu);
+    }
+
+    var keys = Object.keys( eventDictionary);
+    var eventsOrdered = keys.sort() ;
+    updateEventPanel();
+    initVisualisation();
+    
+    function taskObj(taskid, type, inp, out, time) {
+      taskO = {};
+      taskO.task_id = taskid;
+      taskO.type = type;
+      taskO.input = inp;
+      taskO.output = out;
+      taskO.time = time;
+      return taskO;
+    }
+
+    function eventObj(taskid, taskStatus, inp,out, timestamp, ipAddr, pm, cpu) {
+      eventO = {};
+      eventO.task_id = taskid;
+      eventO.tStatus = taskStatus;
+      eventO.input = inp;
+      eventO.output = out;
+      eventO.tStamp = timestamp;
+      eventO.ip = ipAddr;
+      eventO.pmem = pm;
+      eventO.cpu = cpu;
+      return eventO;
+    }
+
+    $("#prevEventB").click( function() { 
+      console.log("Previous");
+      if (currentEvent>0) {
+        currentEvent--;
+        updateEventPanel();
+        updateVisualisation();
+      } 
+    } );
+
+    $("#nextEventB").click( function() {
+      console.log("Next");
+      if (currentEvent < (eventsOrdered.length-2) ) {
+        currentEvent++;
+        updateEventPanel();
+        updateVisualisation();
+      } 
+    } ); 
+    
+    function updateEventPanel( curEvent, totalEvents) {
+      $("#eventPanel").text( (currentEvent+1) + "/" + (eventsOrdered.length-1) );  
+    } ;
+
+    function initVisualisation() {
+      var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length] ];
+      $("#inputList").text( "Input: " +taskDetails["input"] );
+      $("#outputList").text( "Output: " +lastEvent["output"] );
+      $("#timeTaken").text( "Time: " +taskDetails["time"] + " ms" );
+      console.log("init");
+      var curEvent = eventDictionary[ eventsOrdered[0] ]; 
+      console.log("#node_" + curEvent["ip"]);
+      var curNode = canvas.select("#node_" + curEvent["ip"]); 
+      console.log("init");
+      curNode.select("#input").text( "Input: " +curEvent["input"]);
+      console.log("init");
+      curNode.select("#output").text( "Output: " +curEvent["output"]);
+      curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
+      curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
+    } 
+
+    function updateVisualisation() {
+      var curEvent = eventDictionary[ eventsOrdered[currentEvent] ]; 
+      
+      
+      $("#eventData").text( "Input:" + curEvent["input"] + 
+                            " Task status: " + curEvent["tStatus"] + 
+                            " Output: " + curEvent["output"] +
+                            " IP: " + curEvent["ip"] + " CPU Usage: " + curEvent["pmem"]);
+      
+      console.log("ip" + curEvent["ip"]);
+      var curNode = canvas.select("#node_" + curEvent["ip"]); 
+      curNode.select("#input").text( "Input: " +curEvent["input"]);
+      curNode.select("#output").text( "Output: " +curEvent["output"]);
+      curNode.select("#tStatus").text( "Status: " +curEvent["tStatus"]);
+      curNode.select("#cpu").text( "CPU Usage: " +curEvent["cpu"]);
+      //if (curEvent["cpu"]>0){
+        curNode.select("#circle").style( "fill", function(d){return d._children ? "#000" : "#fff"});
+      //}
+    } 
+

@@ -135,15 +135,16 @@ public class StatusMonitor extends UnicastRemoteObject implements StatusMonitor_
             
             System.out.println("Output:");
             line = br.readLine();
+            System.out.println("Line: " + line);
             res = line.split("\\s+"); 
-            for (int i = 0; i < res.length; i++) {
-                //System.out.println(i + ": " + res[i]);
+            for (int i = 0; i < 4; i++) {
+                System.out.println(i + ": " + res[i]);
                 switch (i) {
                     //case 7: DRS = Integer.parseInt(res[i]); //System.out.println("Initial DRS: " + DRS);
                             //continue;
-                    case 2: cpuUsage = (short) Float.parseFloat(res[i]);
-                            //continue;
-                    case 3: PMEM = (short) Float.parseFloat(res[i]);
+                    case 2: cpuUsage = (short) Double.parseDouble(res[i]);
+                            continue;
+                    case 3: PMEM = (short) Double.parseDouble(res[i]);
                             continue;
                     default: continue;
                 }

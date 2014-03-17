@@ -69,8 +69,8 @@ ws.on('message', function(event) {
                 for (i=2; i<splitMessage.length; i++) {
                     eventString += splitMessage[i] + "|";
                 } 
-		//recentTasks.push(splitMessage[2]);
-		//var i = recentTasks.shift();
+		        recentTasks.push(splitMessage[2]);
+		        var i = recentTasks.shift();
                 console.log( "\n" + eventString);
                 //console.log("Event data received and dictionary created.");
                 //console.log( eventDictionary);

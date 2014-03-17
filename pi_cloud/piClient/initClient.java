@@ -41,7 +41,7 @@ public class initClient {
             // NOTE: Currently the the current time is being used instead of the IP address, this is required when testing locally on one machine.
                 // this is caused by the fact hashmaps are used, and if multiple process have the same IP, then the same <key,value> pair will be used between them all.
                 //  Using current system time gives each client a unique ID.
-            client = new Client( "" + System.currentTimeMillis(), serverAddress, serverPort);
+            client = new Client( "192168100100", serverAddress, serverPort);
          //   client.interact();
         } catch (RemoteException e) {
             e.printStackTrace();

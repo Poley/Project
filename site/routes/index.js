@@ -3,13 +3,13 @@
 // Home page route handler
 exports.home = function(req, res) {
         res.render('home', { title: "Distributed Algorithms Using Pi-Cloud",
-				stylesheetRef: "/stylesheets/home.css"
-                             } );
+				stylesheetRef: "/css/bootstrap.css"
+                             });
     };
 
 exports.mergeSort_Home = function (req, res) {
         res.render('mergeHome', { title: "Merge Sort", 
-                                  stylesheetRef: "/stylesheets/mergeSort.css" 
+                                  stylesheetRef: "/css/bootstrap.css" 
                                   } );
     }; 
 
@@ -27,8 +27,6 @@ exports.mergeSort_Input_postHandler = function (req, res) {
         var checkedList = new Array();
         var checkListIndex = 0
         var error=false;
-        eventString = "";
-        eventsOrdered = [];
 
 	if (splitList.length < 2) checkedList = globalList;
 	else {
@@ -60,7 +58,7 @@ exports.mergeSort_History = function (req, res) {
 // VISUALISATION page
 exports.mergeSort_Visualisation = function (req, res) {
         res.render('mergeVis', { title: "Merge Sort - Visualisation",
-                                  stylesheetRef: "/stylesheets/mergeSort.css",
+                                  stylesheetRef:  "/stylesheets/mergeSort.css",
                                   scripts: ["/javascripts/libraries/d3.v3.min.js", "/javascripts/visualisation/visualisation.js", "/javascripts/visualisation/visPage.js"],
                                   events: eventString			
                                   } );
