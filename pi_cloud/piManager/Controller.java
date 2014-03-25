@@ -134,6 +134,35 @@ public class Controller {
 
     // Called when a merge sort's result has been acquired.
     protected void mergeSortResult(int[] result) {
+    	long taskID = 0;
+    	String getTaskID = "SELECT task_id FROM Task WHERE task_id >= ALL (SELECT task_id FROM Task)";
+    	try {
+			PreparedStatement idStatement = dbConnection.prepareStatement(getTaskID);
+			ResultSet bleh = idStatement.executeQuery();
+			
+			while(bleh.next()){
+				taskID = bleh.getLong("task_id");
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	String inputString = "[ " + result[0];
+        
+        for (int i=1; i<result.length ; i++){
+        	inputString += ", " + result[i];
+        }
+        
+        inputString += " ]";
+    	
+    	String taskCreateStr = "UPDATE Task SET output = '" + inputString + "' WHERE task_id = " + taskID;
+        try {
+        	PreparedStatement taskStmt = dbConnection.prepareStatement(taskCreateStr);
+			taskStmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("FAILURE: SQLException");
+			e.printStackTrace();
+		}
         server.sendMergeSortResult(result);
     } 
     
@@ -153,7 +182,7 @@ public class Controller {
             ResultSet taskRs = taskStmt.executeQuery();
             
             while (taskRs.next()){
-            	eventsMessage += "|" + taskRs.getDouble("task_id") + "|";
+            	eventsMessage += "|" + taskRs.getLong("task_id") + "|";
             	eventsMessage += taskRs.getString("type") + "|";
                 eventsMessage += taskRs.getString("input") + "|";
                 eventsMessage += taskRs.getString("output") + "|";
@@ -165,7 +194,7 @@ public class Controller {
     		ResultSet eventRs = eventStmt.executeQuery();
 
     		while (eventRs.next()) {
-    			eventsMessage += "|" + eventRs.getDouble("task_id") + "|";
+    			eventsMessage += "|" + eventRs.getLong("task_id") + "|";
     			eventsMessage += eventRs.getString("status") + "|";
     			eventsMessage += eventRs.getString("input") + "|";
     			eventsMessage += eventRs.getString("output") + "|";
@@ -198,7 +227,7 @@ public class Controller {
             ResultSet taskRs = taskStmt.executeQuery();
             
             while (taskRs.next()){
-            	eventsMessage += "|" + taskRs.getDouble("task_id") + "|";
+            	eventsMessage += "|" + taskRs.getLong("task_id") + "|";
             	eventsMessage += taskRs.getString("type") + "|";
                 eventsMessage += taskRs.getString("input") + "|";
                 eventsMessage += taskRs.getString("output") + "|";
@@ -209,7 +238,7 @@ public class Controller {
             ResultSet eventRs = eventStmt.executeQuery();
 
             while (eventRs.next()) {
-                eventsMessage += "|"+ eventRs.getDouble("task_id") + "|";
+                eventsMessage += "|"+ eventRs.getLong("task_id") + "|";
                 eventsMessage += eventRs.getString("status") + "|";
                 eventsMessage += eventRs.getString("input") + "|";
                 eventsMessage += eventRs.getString("output") + "|";
@@ -240,7 +269,7 @@ public class Controller {
             ResultSet eventRs = eventStmt.executeQuery();
 
             while (eventRs.next()) {
-            	recentTasks += "|" + eventRs.getDouble("task_id");
+            	recentTasks += "|" + eventRs.getLong("task_id");
             } 
         } catch (SQLException e) {
             e.printStackTrace();

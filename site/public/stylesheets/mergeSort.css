@@ -140,6 +140,7 @@ button {
 }
 textarea {
   margin-top: 0.5em;
+  margin-bottom: 0.5em;
   height: 13em;
   width: 26em;
   resize: none;

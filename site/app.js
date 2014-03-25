@@ -69,13 +69,15 @@ ws.on('message', function(event) {
                 for (i=2; i<splitMessage.length; i++) {
                     eventString += splitMessage[i] + "|";
                 } 
-		        recentTasks.push(splitMessage[2]);
-		        var i = recentTasks.shift();
+                if (!recentTasks.contains(splitMessage[2])){ 
+                    recentTasks.push(splitMessage[2]);
+                    var i = recentTasks.shift();
+                }
                 console.log( "\n" + eventString);
                 //console.log("Event data received and dictionary created.");
                 //console.log( eventDictionary);
             } else if (splitMessage[0]=="recentTasks" && splitMessage[1]=="2") {
-                for (i=2; i<splitMessage.length; i++) {
+                for (i=splitMessage.length-1; i>1; i--) {
                     recentTasks.push(splitMessage[i]);
                 } 
                 console.log( "\n" + recentTasks);
@@ -109,6 +111,13 @@ app.get('/merge_sort/history', index.mergeSort_History);
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
     });
+
+Array.prototype.contains = function(k) {
+    for(var p in this)
+        if(this[p] === k)
+            return true;
+    return false;
+}
 
 
 function eventObj(taskid, taskStatus, inp,out, timestamp, ipAddr, pm) {

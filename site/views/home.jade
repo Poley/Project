@@ -4,7 +4,7 @@ block content
     body
         div.navbar.navbar-default.navbar-static-top
             div.container
-                a(href='#').navbar-brand Raspberry Pi Cloud Tool
+                a(href='/').navbar-brand Raspberry Pi Cloud Tool
                 
                 button(data-toggle = "collapse", data-target = ".navHeaderCollapse").navbar-toggle 
                     span.icon-bar
@@ -27,7 +27,7 @@ block content
                 h1 Raspberry Pi Cloud Educational Tool  
                 p Helping to develop your understanding of the raspberry pi cloud
                 p
-                    a(href = "#about").btn.btn-primary.btn-large Learn more
+                    a(href = "#about", data-toggle="modal").btn.btn-primary.btn-large Learn more
                     
             div.row
                 div.col-lg-6
@@ -41,14 +41,27 @@ block content
                         div.panel-heading History
                         div.panel-body
                             h2
-                                a(href="/merge_sort/input") Task 1
+                                a#1
+                            h2
+                                a#2
+                            h2
+                                a#3
+                            h2
+                                a#4
+                            h2
+                                a#5
                                 
-    div(id = "about", role = "dialog").modal fade
-        div.modal-dialog
-            div.modal-content
-                div.modal-header
-                    h4 Raspberry Pi Cloud Tool
-                div.modal-body
-                    p More info
-                div.modal-footer
-                    a(data-dismiss="modal").btn.btn-primary Close
+      script(type="text/javascript")
+        function display(){
+            var tasks = "!{tList}".split(",");
+            for (var i =  5 ; i < 10 ; ++i){
+                var list = document.getElementById(i-4);
+                var link = document.createElement('a');
+                link.href = "/merge_sort/visualisation/" + tasks[i];
+                link.innerHTML = tasks[i];
+                list.appendChild(link);
+                console.log("Added " + tasks[i]);
+            }
+        }
+      
+        display();

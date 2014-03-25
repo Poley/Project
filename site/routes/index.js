@@ -3,7 +3,8 @@
 // Home page route handler
 exports.home = function(req, res) {
         res.render('home', { title: "Distributed Algorithms Using Pi-Cloud",
-				stylesheetRef: "/css/bootstrap.css"
+				stylesheetRef: "/stylesheets/mergeSort.css",
+                            tList: recentTasks
                              });
     };
 
@@ -60,6 +61,6 @@ exports.mergeSort_Visualisation = function (req, res) {
         res.render('mergeVis', { title: "Merge Sort - Visualisation",
                                   stylesheetRef:  "/stylesheets/mergeSort.css",
                                   scripts: ["/javascripts/libraries/d3.v3.min.js", "/javascripts/visualisation/visualisation.js", "/javascripts/visualisation/visPage.js"],
-                                  events: eventString			
+                                  events: eventString
                                   } );
     }; 

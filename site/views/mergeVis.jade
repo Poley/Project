@@ -4,7 +4,7 @@ block content
     body
         div.navbar.navbar-default.navbar-static-top
             div.container
-                a(href='#').navbar-brand Raspberry Pi Cloud Tool
+                a(href='/').navbar-brand Raspberry Pi Cloud Tool
                 
                 button(data-toggle = "collapse", data-target = ".navHeaderCollapse").navbar-toggle 
                     span.icon-bar
@@ -110,7 +110,7 @@ block content
             function initVisualisation() {
               var lastEvent = eventDictionary[ eventsOrdered[eventsOrdered.length] ];
               $("#inputList").text( "Input: " +taskDetails["input"] );
-              $("#outputList").text( "Output: " +lastEvent["output"] );
+              $("#outputList").text( "Output: " +taskDetails["output"] );
               $("#timeTaken").text( "Time: " +taskDetails["time"] + " ms" );
               var curEvent = eventDictionary[ eventsOrdered[0] ]; 
               var curNode = canvas.select("#node_" + curEvent["ip"]); 
